@@ -1,9 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const fruitRoutes = require("./routes/fruitRoutes");
 const userRoutes = require("./routes/userRoutes");
-const secretRoutes = require("./routes/secretRoutes");
+const conversationRoutes = require("./routes/conversationRoutes");
 const mongoose = require("mongoose");
 
 require("dotenv").config();
@@ -16,9 +15,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use("/fruits", fruitRoutes);
-app.use("/user", userRoutes);
-app.use("/secret", secretRoutes);
+app.use("/users", userRoutes);
+app.use("/conversations", conversationRoutes);
 
 mongoose.connection.once("open", () => console.log("Connected to database"));
 mongoose.connection.on("error", (error) =>
