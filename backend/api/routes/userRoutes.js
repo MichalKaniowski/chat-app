@@ -76,8 +76,6 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // const decodedToken = jwt_decode(token);
-
     res.status(200).json({ message: "Logged in succesfully.", token });
   } catch (error) {
     res.status(401).json({ message: "Invalid data" });
