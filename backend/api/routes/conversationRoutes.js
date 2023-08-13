@@ -6,18 +6,20 @@ const User = require("../models/User");
 
 router.get("/", checkAuth, async (req, res) => {
   try {
-    const email = req?.userData.email;
+    const token = await req?.token;
+    const userData = await req.userData;
+    const email = userData?.email;
 
     const user = await User.findOne({ email })
       .populate("conversationIds")
       .select("-password");
-    const conversations = await user.conversationIds;
+    const conversations = await user?.conversationIds;
 
     if (!conversations) {
       return res.status(500).json({ message: "Internal server error." });
     }
 
-    res.status(200).json(conversations);
+    res.status(200).json({ conversations, token });
   } catch (error) {
     res.status(400).json({ message: "Invalid data" });
   }
@@ -50,7 +52,6 @@ router.post("/", checkAuth, async (req, res) => {
     const conversation = await Conversation.create({
       name: "test name of conversation",
       userIds: [requestUserId, targetUserId],
-      // lastMessageAt?
     });
 
     res.status(201).json(conversation);

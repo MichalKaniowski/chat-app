@@ -8,6 +8,7 @@ const userSchema = mongoose.Schema(
     active: { type: Boolean, default: true },
     image: { type: String, default: "" },
     role: { type: String, enum: ["USER", "ADMIN"], default: "USER" },
+    refreshToken: { type: String, default: "" },
 
     conversationIds: [{ type: mongoose.Types.ObjectId, ref: "Conversation" }],
     seenMessageIds: [{ type: mongoose.Types.ObjectId, ref: "Message" }],

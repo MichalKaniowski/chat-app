@@ -17,7 +17,7 @@ export default function AuthForm() {
     if (token) {
       navigate("/users");
     }
-  }, [token]);
+  }, [token, navigate]);
 
   async function formSubmitHandler(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +40,10 @@ export default function AuthForm() {
 
     if (user && user?.status === 200) {
       sessionStorage.setItem("token", user?.data?.token);
+      sessionStorage.setItem("refreshToken", user?.data?.refreshToken);
     }
+
+    navigate("/users");
   }
 
   async function handleLogin(email: string, password: string) {
@@ -51,7 +54,10 @@ export default function AuthForm() {
 
     if (user && user?.status === 200) {
       sessionStorage.setItem("token", user?.data?.token);
+      sessionStorage.setItem("refreshToken", user?.data?.refreshToken);
     }
+
+    navigate("/users");
   }
 
   function formStateChangeHandler() {
