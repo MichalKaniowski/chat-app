@@ -20,8 +20,6 @@ export default function Users() {
 
       const people: User[] = response.data;
 
-      console.log(people);
-
       setUsers(people?.filter((user) => user.email !== decodedToken.email));
     }
 
