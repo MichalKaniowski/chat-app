@@ -17,7 +17,7 @@ const conversationSchema = mongoose.Schema(
 
 conversationSchema.post("save", async (doc) => {
   try {
-    // once conversation is added every user which belongs to that conversations will have conversationIds updated
+    // once conversation is created every user which belongs to that conversation, will have it's conversationIds updated
     await User.updateMany(
       { _id: { $in: doc.userIds } },
       { $addToSet: { conversationIds: doc._id } }

@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
-const mongoose = require("mongoose");
+const messageRoutes = require("./routes/messageRoutes");
 
 require("dotenv").config();
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 
 app.use("/users", userRoutes);
 app.use("/conversations", conversationRoutes);
+app.use("/messages", messageRoutes);
 
 mongoose.connection.once("open", () => console.log("Connected to database"));
 mongoose.connection.on("error", (error) =>
