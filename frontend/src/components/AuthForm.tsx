@@ -1,13 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import styles from "./AuthForm.module.css";
+import { AiOutlineGoogle, AiFillGithub } from "react-icons/ai";
+import Input from "./ui/Input";
 
 type FormState = "register" | "login";
 
 export default function AuthForm() {
   const [formState, setFormState] = useState<FormState>("register");
-  const emailRef = useRef<HTMLInputElement>(null!);
-  const passwordRef = useRef<HTMLInputElement>(null!);
+  const [error, setError] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
@@ -18,47 +23,6 @@ export default function AuthForm() {
       navigate("/users");
     }
   }, [token, navigate]);
-
-  async function formSubmitHandler(e: React.FormEvent) {
-    e.preventDefault();
-
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
-
-    if (formState === "register") {
-      handleSignup(email, password);
-    } else if (formState === "login") {
-      handleLogin(email, password);
-    }
-  }
-
-  async function handleSignup(email: string, password: string) {
-    const user = await axios.post("http://localhost:3000/users/signup", {
-      email,
-      password,
-    });
-
-    if (user && user?.status === 200) {
-      sessionStorage.setItem("token", user?.data?.token);
-      sessionStorage.setItem("refreshToken", user?.data?.refreshToken);
-    }
-
-    navigate("/users");
-  }
-
-  async function handleLogin(email: string, password: string) {
-    const user = await axios.post("http://localhost:3000/users/login", {
-      email,
-      password,
-    });
-
-    if (user && user?.status === 200) {
-      sessionStorage.setItem("token", user?.data?.token);
-      sessionStorage.setItem("refreshToken", user?.data?.refreshToken);
-    }
-
-    navigate("/users");
-  }
 
   function formStateChangeHandler() {
     setFormState((prevState) => {
@@ -72,19 +36,102 @@ export default function AuthForm() {
     });
   }
 
+  async function formSubmitHandler(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!email || !email.includes("@") || !email.includes(".")) {
+      setError("Invalid email.");
+    }
+
+    if (!password) {
+      setError("Password is required.");
+      return;
+    }
+
+    if (password.trim().length < 6) {
+      setError("Your password is too weak");
+      return;
+    }
+
+    let url = "";
+    if (formState === "register") {
+      url = "http://localhost:3000/users/signup";
+    } else if (formState === "login") {
+      url = "http://localhost:3000/users/login";
+    }
+
+    const user = await axios
+      .post(url, {
+        email,
+        password,
+      })
+      .then((callback) => {
+        sessionStorage.setItem("token", callback?.data?.token);
+        sessionStorage.setItem("refreshToken", callback?.data?.refreshToken);
+        navigate("/users");
+      })
+      .catch((error) => {
+        setError(error.response.data.message);
+      });
+  }
+
   return (
-    <form onSubmit={formSubmitHandler}>
-      <h1>{formState === "register" ? "Sign up" : "Sign in"}</h1>
-      <input ref={emailRef} />
-      <input ref={passwordRef} />
-      <button>{formState === "register" ? "Sign up" : "Sign in"}</button>
-      <button
-        type="button"
-        onClick={formStateChangeHandler}
-        style={{ display: "block", marginTop: "15px" }}
-      >
-        change
-      </button>
-    </form>
+    <div className={styles.container}>
+      <div className={styles["form-container"]} onSubmit={formSubmitHandler}>
+        <form>
+          <h1 className={styles.heading}>
+            {formState === "register" ? "Sign up" : "Sign in"}
+          </h1>
+
+          <Input
+            id="email"
+            label="Email"
+            onValueChange={(value: string) => setEmail(value)}
+            validate={(value: string) =>
+              value.includes("@") && value.includes(".")
+            }
+          />
+
+          <Input
+            id="password"
+            label="Password"
+            onValueChange={(value: string) => setPassword(value)}
+            type="password"
+            validate={(value: string) => value.length > 5}
+          />
+
+          {error && <p>{error}</p>}
+          <button className={styles["action-button"]}>
+            {formState === "register" ? "Sign up" : "Sign in"}
+          </button>
+        </form>
+
+        <hr />
+
+        <div className={styles["social-buttons-container"]}>
+          <button className={styles["social-button"]}>
+            <AiOutlineGoogle size={24} />
+          </button>
+          <button className={styles["social-button"]}>
+            <AiFillGithub size={24} />
+          </button>
+        </div>
+
+        <div className={styles["already-user"]}>
+          <p>
+            {formState === "login"
+              ? "Don't have an account?"
+              : "Already a user?"}
+          </p>
+          <button
+            className={styles["change-action-button"]}
+            type="button"
+            onClick={formStateChangeHandler}
+          >
+            {formState === "login" ? "SIGN UP" : "SIGN IN"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

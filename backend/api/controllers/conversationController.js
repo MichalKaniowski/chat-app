@@ -10,7 +10,15 @@ async function getConversations(req, res) {
     const user = await User.findOne({ email })
       .populate("conversationIds")
       .select("-password");
+
     const conversations = await user?.conversationIds;
+
+    const populatedConversations = [];
+
+    for (const conversation of conversations) {
+      const populatedConversation = await conversation.populate("userIds");
+      populatedConversations.push(populatedConversation);
+    }
 
     if (!conversations) {
       return res.status(500).json({ message: "Internal server error." });
@@ -43,13 +51,25 @@ async function createConversation(req, res) {
     );
 
     if (existingConversation) {
-      return res.status(200).json(existingConversation);
+      const populatedExistingConversation = await existingConversation.populate(
+        [
+          { path: "userIds", select: "-password" },
+          { path: "messageIds", populate: { path: "authorId" } },
+        ]
+      );
+
+      return res.status(200).json(populatedExistingConversation);
     }
 
-    const conversation = await Conversation.create({
+    let conversation = await Conversation.create({
       name: "test name of conversation",
       userIds: [requestUserId, targetUserId],
     });
+
+    conversation = await conversation.populate([
+      { path: "userIds", select: "-password" },
+      { path: "messageIds", populate: { path: "authorId" } },
+    ]);
 
     res.status(201).json(conversation);
   } catch (error) {
@@ -57,4 +77,20 @@ async function createConversation(req, res) {
   }
 }
 
-module.exports = { getConversations, createConversation };
+async function getConversation(req, res) {
+  try {
+    const conversationId = req.params.conversationId;
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+    }).populate([
+      { path: "userIds", select: "-password" },
+      { path: "messageIds", populate: { path: "authorId" } },
+    ]);
+
+    res.status(200).json(conversation);
+  } catch (error) {
+    res.status(400).json({ message: "Invalid conversationId" });
+  }
+}
+
+module.exports = { getConversations, createConversation, getConversation };

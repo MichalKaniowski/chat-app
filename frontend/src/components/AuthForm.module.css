@@ -1,0 +1,90 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(240, 240, 240);
+}
+
+.form-container {
+  position: relative;
+  background-color: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  min-width: 300px;
+  width: 25%;
+  max-width: 400px;
+  /* min-height: 450px; */
+}
+
+button {
+  cursor: pointer;
+}
+
+.heading {
+  font-size: 2.6rem;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+input {
+  display: block;
+  padding: 6px;
+  width: 100%;
+}
+
+label {
+  font-weight: 500;
+}
+
+.action-button {
+  width: 100%;
+  background-color: inherit;
+  border: none;
+  background-color: #0084ff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin: 5px 0 10px;
+  font-size: 1.1rem;
+}
+
+.social-buttons-container {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.social-button {
+  flex-grow: 1;
+  background: inherit;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 3px 8px;
+}
+
+.social-button:hover {
+  background-color: rgb(219, 219, 219);
+}
+
+.already-user {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 60px;
+  font-size: 0.9rem;
+}
+
+.change-action-button {
+  background-color: inherit;
+  border: none;
+  text-decoration: underline;
+  letter-spacing: 0.5px;
+}

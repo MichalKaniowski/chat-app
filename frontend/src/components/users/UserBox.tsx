@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { User } from "../types/database";
+import { User } from "../../types/database";
+import styles from "./UserBox.module.css";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
@@ -23,21 +24,25 @@ export default function UserBox({ user }: { user: User }) {
     const serializedConversation = {
       ...conversation.data,
       _id: conversation.data._id.toString(),
-      userIds: conversation.data.userIds.map((userId: string) =>
-        userId.toString()
-      ),
     };
 
-    navigate(`/conversations/${conversation?.data?._id}`, {
+    navigate(`/conversations/${serializedConversation?._id}`, {
       state: serializedConversation,
     });
   }
 
   return (
-    <div style={{ marginBottom: "50px" }}>
-      <h3>{user.username}</h3>
-      <p>{user.email}</p>
-      <button onClick={conversationCreateHandler}>Create conversation</button>
+    <div className={styles["user-box"]} onClick={conversationCreateHandler}>
+      <div>
+        <img
+          className={styles["user-img"]}
+          src="/images/person-placeholder.png"
+        />
+      </div>
+      <div>
+        <h3 className={styles.username}>{user.username}</h3>
+        <p>Last message</p>
+      </div>
     </div>
   );
 }

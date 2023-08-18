@@ -6,8 +6,9 @@ const conversationSchema = mongoose.Schema(
     name: { type: String, required: true },
     lastMessageAt: { type: Date },
     isGroup: { type: Boolean, default: false },
+    image: { type: String, default: "" },
 
-    userIds: [{ type: mongoose.Types.ObjectId, ref: "User", required: true }],
+    userIds: [{ type: mongoose.Types.ObjectId, ref: "User", default: [] }],
     messageIds: [
       { type: mongoose.Types.ObjectId, ref: "Message", default: [] },
     ],

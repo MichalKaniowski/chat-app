@@ -4,8 +4,8 @@ const Conversation = require("./Conversation");
 
 const messageSchema = mongoose.Schema(
   {
-    body: { type: String },
-    image: { type: String },
+    body: { type: String, required: true },
+    image: { type: String, required: true },
     authorId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     conversationId: {
       type: mongoose.Types.ObjectId,

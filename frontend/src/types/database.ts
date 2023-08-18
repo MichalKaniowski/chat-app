@@ -20,3 +20,22 @@ export interface User {
   seenMessageIds: string[];
   sentMessageIds: string[];
 }
+
+export interface Conversation {
+  _id: string;
+  name: string;
+  lastMessageAt: Date;
+  isGroup: boolean;
+  image: string;
+  userIds: string[] | User[];
+  messageIds: string[] | Message[];
+}
+
+export interface Message {
+  _id: string;
+  body: string;
+  image: string;
+  authorId: string | User;
+  conversationId: string | Conversation;
+  seenIds: string[];
+}

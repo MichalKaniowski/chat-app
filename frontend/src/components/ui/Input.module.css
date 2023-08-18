@@ -1,0 +1,14 @@
+.input-container {
+  margin-bottom: 15px;
+}
+
+input {
+  display: block;
+  padding: 6px;
+  width: 100%;
+  border: 1px solid black;
+}
+
+label {
+  font-weight: 500;
+}

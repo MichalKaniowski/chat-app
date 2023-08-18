@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Users from "./components/Users.tsx";
-import Conversations from "./components/Conversations.tsx";
-import Conversation from "./components/Conversation.tsx";
+
+import UsersPage from "./pages/Users.tsx";
+import ConversationsPage from "./pages/Conversations.tsx";
 import Error from "./components/Error.tsx";
 
 const router = createBrowserRouter([
@@ -12,15 +12,15 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
   },
-  { path: "/users", element: <Users />, errorElement: <Error /> },
+  { path: "/users", element: <UsersPage />, errorElement: <Error /> },
   {
     path: "/conversations",
-    element: <Conversations />,
+    element: <ConversationsPage />,
     errorElement: <Error />,
   },
   {
     path: "/conversations/:conversationId",
-    element: <Conversation />,
+    element: <ConversationsPage />,
     errorElement: <Error />,
   },
 ]);

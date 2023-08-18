@@ -1,37 +1,23 @@
-const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
 
 async function createMessage(req, res) {
   try {
     const { body, image, authorId, conversationId } = req.body;
 
-    if ((!body && !image) || !authorId || !conversationId) {
+    if (!body || !image || !authorId || !conversationId) {
       return res.status(400).json({ message: "Invalid data" });
     }
 
-    const message = await Message.create({
+    let message = await Message.create({
       body,
       image,
       authorId,
       conversationId,
     });
 
+    message = await message.populate("authorId");
+
     res.status(201).json(message);
-  } catch (error) {
-    res.status(400).json({ message: "Invalid data" });
-  }
-}
-
-async function getMessages(req, res) {
-  try {
-    const { conversationId } = req.body;
-
-    const conversation = await Conversation.findOne({
-      _id: conversationId,
-    }).populate("messageIds");
-    const messages = await conversation.messageIds;
-
-    res.status(200).json(messages);
   } catch (error) {
     res.status(400).json({ message: "Invalid data" });
   }
@@ -62,4 +48,4 @@ async function deleteMessage(req, res) {
   }
 }
 
-module.exports = { createMessage, getMessages, deleteMessage };
+module.exports = { createMessage, deleteMessage };
