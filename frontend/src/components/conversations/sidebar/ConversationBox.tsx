@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConversationBox.module.css";
 import { Conversation } from "../../../types/database";
+import toast from "react-hot-toast";
 
 export default function ConversationBox({
   conversation,
@@ -14,16 +15,20 @@ export default function ConversationBox({
   const refreshToken = sessionStorage.getItem("refreshToken") as string;
 
   async function getConversationHandler(conversationId: string) {
-    const res = await axios.get(
-      `http://localhost:3000/conversations/${conversationId}`,
-      { headers: { Authorization: `Bearer ${token}, Basic ${refreshToken}` } }
-    );
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/conversations/${conversationId}`,
+        { headers: { Authorization: `Bearer ${token}, Basic ${refreshToken}` } }
+      );
 
-    const conversation = await res.data;
+      const conversation = await res.data;
 
-    navigate(`/conversations/${conversation?._id}`, {
-      state: conversation,
-    });
+      navigate(`/conversations/${conversation?._id}`, {
+        state: conversation,
+      });
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
   }
 
   return (

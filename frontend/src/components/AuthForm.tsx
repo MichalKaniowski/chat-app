@@ -4,12 +4,12 @@ import axios from "axios";
 import styles from "./AuthForm.module.css";
 import { AiOutlineGoogle, AiFillGithub } from "react-icons/ai";
 import Input from "./ui/Input";
+import toast from "react-hot-toast";
 
 type FormState = "register" | "login";
 
 export default function AuthForm() {
-  const [formState, setFormState] = useState<FormState>("register");
-  const [error, setError] = useState("");
+  const [formState, setFormState] = useState<FormState>("login");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,16 +40,17 @@ export default function AuthForm() {
     e.preventDefault();
 
     if (!email || !email.includes("@") || !email.includes(".")) {
-      setError("Invalid email.");
+      toast.error("Invalid email");
+      return;
     }
 
     if (!password) {
-      setError("Password is required.");
+      toast.error("Invalid password");
       return;
     }
 
     if (password.trim().length < 6) {
-      setError("Your password is too weak");
+      toast.error("Your password is too weak");
       return;
     }
 
@@ -69,9 +70,12 @@ export default function AuthForm() {
         sessionStorage.setItem("token", callback?.data?.token);
         sessionStorage.setItem("refreshToken", callback?.data?.refreshToken);
         navigate("/users");
+        toast.success(
+          `Succesfully ${formState === "login" ? "logged in." : "signed up"}`
+        );
       })
-      .catch((error) => {
-        setError(error.response.data.message);
+      .catch(() => {
+        toast.error("Invalid credentials");
       });
   }
 
@@ -100,14 +104,11 @@ export default function AuthForm() {
             validate={(value: string) => value.length > 5}
           />
 
-          {error && <p>{error}</p>}
           <button className={styles["action-button"]}>
             {formState === "register" ? "Sign up" : "Sign in"}
           </button>
         </form>
-
         <hr />
-
         <div className={styles["social-buttons-container"]}>
           <button className={styles["social-button"]}>
             <AiOutlineGoogle size={24} />
@@ -116,7 +117,6 @@ export default function AuthForm() {
             <AiFillGithub size={24} />
           </button>
         </div>
-
         <div className={styles["already-user"]}>
           <p>
             {formState === "login"

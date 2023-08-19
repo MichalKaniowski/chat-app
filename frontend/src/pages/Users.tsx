@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode";
 import axios from "axios";
 import DesktopSidebar from "../components/navigation/DesktopSidebar";
 import EmptyState from "../components/EmptyState";
+import toast from "react-hot-toast";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,11 +15,15 @@ export default function UsersPage() {
 
   useEffect(() => {
     async function getUsers() {
-      const response = await axios.get("http://localhost:3000/users");
+      try {
+        const response = await axios.get("http://localhost:3000/users");
 
-      const people: User[] = response.data;
+        const people: User[] = response.data;
 
-      setUsers(people?.filter((user) => user.email !== decodedToken.email));
+        setUsers(people?.filter((user) => user.email !== decodedToken.email));
+      } catch (error) {
+        toast.error("Something went wrong while getting users.");
+      }
     }
 
     getUsers();

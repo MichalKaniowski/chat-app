@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import Conversation from "../components/conversations/conversation/Conversation";
 import { Conversation as ConversationType, Message } from "../types/database";
+import toast from "react-hot-toast";
 
 export default function ConversationsPage() {
   const [conversations, setConversations] = useState<ConversationType[]>([]);
@@ -29,21 +30,25 @@ export default function ConversationsPage() {
     }
 
     async function getConversations() {
-      const res = await axios.get("http://localhost:3000/conversations", {
-        headers: {
-          Authorization: `Bearer ${token}, Basic ${refreshToken}`,
-        },
-      });
+      try {
+        const res = await axios.get("http://localhost:3000/conversations", {
+          headers: {
+            Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+          },
+        });
 
-      const data = await res.data;
-      const newAccessToken = data?.token;
+        const data = await res.data;
+        const newAccessToken = data?.token;
 
-      if (newAccessToken) {
-        sessionStorage.setItem("token", newAccessToken);
+        if (newAccessToken) {
+          sessionStorage.setItem("token", newAccessToken);
+        }
+
+        const conversations = data.conversations;
+        setConversations(conversations);
+      } catch (error) {
+        toast.error("Something went wrong while getting conversations.");
       }
-
-      const conversations = data.conversations;
-      setConversations(conversations);
     }
 
     getConversations();

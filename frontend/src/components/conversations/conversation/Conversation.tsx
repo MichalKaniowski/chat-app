@@ -4,6 +4,7 @@ import { IoMdSend } from "react-icons/io";
 import jwt_decode from "jwt-decode";
 import { Token, Conversation, User, Message } from "../../../types/database";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface ConversationProps {
   conversation: Conversation;
@@ -53,8 +54,10 @@ export default function ConversationComponent({
       onMessageAdd(message);
 
       messageRef.current.value = "";
+
+      toast.success("Succesfully sent a message");
     } catch {
-      console.log("Something went wrong");
+      toast.error("Something went wrong");
     }
   }
 
