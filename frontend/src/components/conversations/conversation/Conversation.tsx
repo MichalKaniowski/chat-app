@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import styles from "./Conversation.module.css";
 import { IoMdSend } from "react-icons/io";
 import jwt_decode from "jwt-decode";
@@ -24,6 +24,10 @@ export default function ConversationComponent({
 
   const users = conversation?.userIds as User[];
   const messages = conversation?.messageIds as Message[];
+
+  useEffect(() => {
+    document.querySelector("#scroll-to")?.scrollIntoView();
+  }, [conversation]);
 
   async function messageCreateHandler(e: React.FormEvent) {
     e.preventDefault();
@@ -121,6 +125,7 @@ export default function ConversationComponent({
                 </li>
               );
             })}
+            <div id="scroll-to"></div>
           </ul>
         </div>
       ) : (

@@ -15,14 +15,35 @@ export default function ConversationsPage() {
   const [activeConversation, setActiveConversation] =
     useState<ConversationType>(state);
 
+  const token = sessionStorage.getItem("token");
+  const refreshToken = sessionStorage.getItem("refreshToken");
+
+  useEffect(() => {
+    // at refresh get the newest state of conversation
+    async function getAndSetNewestConversation() {
+      const conversationId = activeConversation._id;
+
+      const res = await axios.get(
+        `http://localhost:3000/conversations/${conversationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+          },
+        }
+      );
+      const conversation = await res.data;
+
+      setActiveConversation(conversation);
+    }
+
+    getAndSetNewestConversation();
+  }, []);
+
   useEffect(() => {
     setActiveConversation(state);
   }, [state]);
 
   const navigate = useNavigate();
-
-  const token = sessionStorage.getItem("token");
-  const refreshToken = sessionStorage.getItem("refreshToken");
 
   useEffect(() => {
     if (!token) {

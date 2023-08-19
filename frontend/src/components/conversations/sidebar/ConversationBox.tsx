@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConversationBox.module.css";
 import { Conversation } from "../../../types/database";
