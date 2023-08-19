@@ -13,6 +13,7 @@ export default function AuthForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
 
   const navigate = useNavigate();
 
@@ -63,6 +64,7 @@ export default function AuthForm() {
 
     const user = await axios
       .post(url, {
+        username,
         email,
         password,
       })
@@ -86,6 +88,15 @@ export default function AuthForm() {
           <h1 className={styles.heading}>
             {formState === "register" ? "Sign up" : "Sign in"}
           </h1>
+
+          {formState === "register" && (
+            <Input
+              id="username"
+              label="Username"
+              onValueChange={(value: string) => setUsername(value)}
+              validate={(value: string) => value.length > 0}
+            />
+          )}
 
           <Input
             id="email"

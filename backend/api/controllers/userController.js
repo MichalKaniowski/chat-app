@@ -26,9 +26,9 @@ async function getUsers(req, res) {
 
 async function createUser(req, res) {
   try {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !username) {
       return res
         .status(400)
         .json({ message: "Email and password are required." });
@@ -45,7 +45,7 @@ async function createUser(req, res) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
-      username: "username",
+      username,
       email,
       password: hashedPassword,
     });

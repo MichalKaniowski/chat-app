@@ -58,8 +58,6 @@ export default function ConversationComponent({
       onMessageAdd(message);
 
       messageRef.current.value = "";
-
-      toast.success("Succesfully sent a message");
     } catch {
       toast.error("Something went wrong");
     }
