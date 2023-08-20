@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import styles from "./Conversation.module.css";
 import { IoMdSend } from "react-icons/io";
-import jwt_decode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import { Token, Conversation, User, Message } from "../../../types/database";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,21 +9,27 @@ import toast from "react-hot-toast";
 interface ConversationProps {
   conversation: Conversation;
   onMessageAdd: (messageId: Message) => void;
+  isLoading: boolean;
 }
 
 export default function ConversationComponent({
   conversation,
   onMessageAdd,
+  isLoading,
 }: ConversationProps) {
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
   const token = sessionStorage.getItem("token") as string;
-  const { id, email } = jwt_decode(token) as Token;
+  const { id, email } = jwtDecode(token) as Token;
   const refreshToken = sessionStorage.getItem("refreshToken") as string;
   const messageRef = useRef<HTMLInputElement>(null!);
 
   const users = conversation?.userIds as User[];
   const messages = conversation?.messageIds as Message[];
+
+  const conversationName = conversation.isGroup
+    ? conversation.name
+    : users.find((user) => user._id !== id)?.username;
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -63,13 +69,15 @@ export default function ConversationComponent({
     }
   }
 
-  return (
+  const content = isLoading ? (
+    <div>loading</div>
+  ) : (
     <div className={styles.conversation}>
       <div className={styles.header}>
         <div className={styles["header-content"]}>
           <img src={imgSrc} className={styles["conversation-img"]} />
           <div>
-            <h3>{conversation?.name}</h3>
+            <h3>{conversationName}</h3>
             <p>Active</p>
           </div>
         </div>
@@ -150,4 +158,6 @@ export default function ConversationComponent({
       </div>
     </div>
   );
+
+  return content;
 }

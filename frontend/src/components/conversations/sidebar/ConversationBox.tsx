@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConversationBox.module.css";
-import { Conversation } from "../../../types/database";
+import { Conversation, Token, User } from "../../../types/database";
 import toast from "react-hot-toast";
+import jwtDecode from "jwt-decode";
 
 export default function ConversationBox({
   conversation,
@@ -12,7 +13,14 @@ export default function ConversationBox({
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token") as string;
+  const { id } = jwtDecode(token) as Token;
   const refreshToken = sessionStorage.getItem("refreshToken") as string;
+
+  const users = conversation.userIds as User[];
+
+  const conversationName = conversation.isGroup
+    ? conversation.name
+    : users.find((user) => user._id !== id)?.username;
 
   async function getConversationHandler(conversationId: string) {
     try {
@@ -43,7 +51,7 @@ export default function ConversationBox({
         />
       </div>
       <div>
-        <h3 className={styles.name}>{conversation.name}</h3>
+        <h3 className={styles.name}>{conversationName}</h3>
         <p>Last message</p>
       </div>
     </div>

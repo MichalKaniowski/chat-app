@@ -32,7 +32,7 @@ async function getConversations(req, res) {
 
 async function createConversation(req, res) {
   try {
-    const { id: targetUserId } = req.body;
+    const { id: targetUserId, name } = req.body;
 
     const requestUserId = req.userData.id;
     if (!requestUserId || !targetUserId) {
@@ -62,7 +62,7 @@ async function createConversation(req, res) {
     }
 
     let conversation = await Conversation.create({
-      name: "test name of conversation",
+      name: name ? name : "",
       userIds: [requestUserId, targetUserId],
     });
 
