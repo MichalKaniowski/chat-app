@@ -40,7 +40,7 @@ export default function ConversationsPage() {
   }, [state]);
 
   async function getAndSetNewestConversation() {
-    const conversationId = activeConversation?._id;
+    const conversationId = activeConversation?._id || state?._id;
 
     if (!conversationId) return null;
 
@@ -98,9 +98,9 @@ export default function ConversationsPage() {
       />
       {state ? (
         <Conversation
-          conversation={activeConversation}
+          conversation={activeConversation || state}
           onMessageAdd={addMessageHandler}
-          isLoading={conversationIsLoading}
+          isLoading={conversationIsLoading || state?.message === "loading"}
         />
       ) : (
         <EmptyState />

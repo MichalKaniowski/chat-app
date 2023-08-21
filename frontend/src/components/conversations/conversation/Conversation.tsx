@@ -5,6 +5,7 @@ import jwtDecode from "jwt-decode";
 import { Token, Conversation, User, Message } from "../../../types/database";
 import axios from "axios";
 import toast from "react-hot-toast";
+import ConversationSkeleton from "../../skeletons/ConversationSkeleton";
 
 interface ConversationProps {
   conversation: Conversation;
@@ -27,9 +28,9 @@ export default function ConversationComponent({
   const users = conversation?.userIds as User[];
   const messages = conversation?.messageIds as Message[];
 
-  const conversationName = conversation.isGroup
+  const conversationName = conversation?.isGroup
     ? conversation.name
-    : users.find((user) => user._id !== id)?.username;
+    : users?.find((user) => user._id !== id)?.username;
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -69,8 +70,10 @@ export default function ConversationComponent({
     }
   }
 
+  if (!conversation) return null;
+
   const content = isLoading ? (
-    <div>loading</div>
+    <ConversationSkeleton />
   ) : (
     <div className={styles.conversation}>
       <div className={styles.header}>
@@ -122,9 +125,7 @@ export default function ConversationComponent({
                           color: isPersonAnAuthor ? "white" : "black",
                         }}
                       >
-                        <p className={styles["message-content"]}>
-                          {message.body}
-                        </p>
+                        <p>{message.body}</p>
                       </div>
                     </div>
                   </div>

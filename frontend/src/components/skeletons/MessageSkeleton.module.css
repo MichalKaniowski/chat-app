@@ -1,0 +1,25 @@
+.message {
+  margin-bottom: 10px;
+  min-height: 70px;
+  position: relative;
+}
+
+.message-content {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  z-index: 5;
+  position: relative;
+}
+
+.message-info {
+  width: 250px;
+}
+
+.message-author {
+  width: 130px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: -5px 0 5px;
+}

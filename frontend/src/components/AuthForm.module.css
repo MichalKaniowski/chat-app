@@ -82,6 +82,10 @@ label {
   font-size: 0.9rem;
 }
 
+.already-user p {
+  width: auto;
+}
+
 .change-action-button {
   background-color: inherit;
   border: none;

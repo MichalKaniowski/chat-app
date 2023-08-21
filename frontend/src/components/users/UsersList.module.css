@@ -1,6 +1,10 @@
 .users-list {
+  display: flex;
+}
+
+.users-list-content {
+  width: 20vw;
   overflow-y: auto;
-  width: 20%;
 }
 
 .heading {

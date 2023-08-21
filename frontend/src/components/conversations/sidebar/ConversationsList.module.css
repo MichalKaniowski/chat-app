@@ -1,7 +1,10 @@
 .conversations-list {
-  overflow-y: auto;
-  width: 20%;
   display: flex;
+}
+
+.conversations-list-content {
+  width: 20vw;
+  overflow-y: auto;
 }
 
 .heading {

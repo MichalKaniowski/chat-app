@@ -1,0 +1,56 @@
+.conversation {
+  width: 100%;
+}
+
+.header-content {
+  display: flex;
+  padding: 10px 15px;
+  gap: 10px;
+  height: 70px;
+}
+
+.conversation-info {
+  width: 100%;
+}
+
+.conversation-name {
+  width: 10%;
+}
+
+.user-active {
+  width: 15%;
+}
+
+.body {
+  height: calc(100vh - 72px - 45px - 10px);
+  padding: 0 10px;
+  overflow-y: auto;
+}
+
+.messages {
+  list-style: none;
+}
+
+.footer {
+  height: 45px;
+  position: relative;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px 5px;
+}
+
+.message-form {
+  width: 100%;
+  padding: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 7px;
+}
+
+.message-input {
+  width: 106%;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+}

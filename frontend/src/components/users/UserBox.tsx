@@ -10,6 +10,10 @@ export default function UserBox({ user }: { user: User }) {
     const token = sessionStorage.getItem("token");
     const refreshToken = sessionStorage.getItem("refreshToken");
 
+    navigate(`/conversations/dfjadsfk`, {
+      state: { message: "loading" },
+    });
+
     const conversation = await axios.post(
       "http://localhost:3000/conversations",
       { id: user._id },

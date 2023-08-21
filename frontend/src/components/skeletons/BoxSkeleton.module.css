@@ -1,0 +1,21 @@
+.box {
+  width: 100%;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.left-column {
+  margin-right: 10px;
+}
+
+.right-column {
+  width: calc(90% - 50px);
+}
+
+h2 {
+  width: 60%;
+}
+
+p {
+  width: 90%;
+}

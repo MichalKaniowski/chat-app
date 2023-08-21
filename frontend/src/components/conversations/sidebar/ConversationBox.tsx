@@ -24,6 +24,10 @@ export default function ConversationBox({
 
   async function getConversationHandler(conversationId: string) {
     try {
+      navigate(`/conversations/${conversationId}`, {
+        state: { message: "loading" },
+      });
+
       const res = await axios.get(
         `http://localhost:3000/conversations/${conversationId}`,
         { headers: { Authorization: `Bearer ${token}, Basic ${refreshToken}` } }
