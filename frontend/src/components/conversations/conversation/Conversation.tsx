@@ -6,6 +6,8 @@ import { Token, Conversation, User, Message } from "../../../types/database";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ConversationSkeleton from "../../skeletons/ConversationSkeleton";
+import getConversationName from "../../../utils/getConversationName";
+import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 
 interface ConversationProps {
   conversation: Conversation;
@@ -22,15 +24,12 @@ export default function ConversationComponent({
 
   const token = sessionStorage.getItem("token") as string;
   const { id, email } = jwtDecode(token) as Token;
-  const refreshToken = sessionStorage.getItem("refreshToken") as string;
   const messageRef = useRef<HTMLInputElement>(null!);
 
   const users = conversation?.userIds as User[];
   const messages = conversation?.messageIds as Message[];
 
-  const conversationName = conversation?.isGroup
-    ? conversation.name
-    : users?.find((user) => user._id !== id)?.username;
+  const conversationName = getConversationName(conversation);
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -56,7 +55,7 @@ export default function ConversationComponent({
         },
         {
           headers: {
-            Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+            Authorization: getAuthorizationHeader(),
           },
         }
       );

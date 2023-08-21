@@ -8,14 +8,12 @@ import Conversation from "../components/conversations/conversation/Conversation"
 import { Conversation as ConversationType, Message } from "../types/database";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
+import getAuthorizationHeader from "../utils/getAuthorizationHeader";
 
 export default function ConversationsPage() {
   const { state } = useLocation();
   const [activeConversation, setActiveConversation] =
     useState<ConversationType>(state);
-
-  const token = sessionStorage.getItem("token");
-  const refreshToken = sessionStorage.getItem("refreshToken");
 
   const { isLoading: conversationIsLoading } = useQuery(
     ["conversation"],
@@ -48,7 +46,7 @@ export default function ConversationsPage() {
       `http://localhost:3000/conversations/${conversationId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+          Authorization: getAuthorizationHeader(),
         },
       }
     );
@@ -62,7 +60,7 @@ export default function ConversationsPage() {
     try {
       const res = await axios.get("http://localhost:3000/conversations", {
         headers: {
-          Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+          Authorization: getAuthorizationHeader(),
         },
       });
 

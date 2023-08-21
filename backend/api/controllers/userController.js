@@ -34,6 +34,10 @@ async function createUser(req, res) {
         .json({ message: "Email and password are required." });
     }
 
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password is too weak." });
+    }
+
     const userInDatabase = await User.findOne({ email });
 
     if (userInDatabase) {

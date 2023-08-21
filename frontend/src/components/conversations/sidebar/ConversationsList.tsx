@@ -1,7 +1,10 @@
+import { useState, useMemo } from "react";
 import styles from "./ConversationsList.module.css";
 import ConversationBox from "./ConversationBox";
 import { Conversation } from "../../../types/database";
 import ConversationBoxSkeleton from "../../skeletons/BoxSkeleton";
+import getConversationName from "../../../utils/getConversationName";
+import Searchbar from "../../ui/Searchbar";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -9,9 +12,18 @@ interface ConversationListProps {
 }
 
 export default function ConversationsList({
-  conversations,
+  conversations: initialConversations,
   isLoading,
 }: ConversationListProps) {
+  const [searchValue, setSearchValue] = useState("");
+
+  const conversations = useMemo(() => {
+    return initialConversations?.filter((conv) => {
+      const conversationName = getConversationName(conv);
+      return conversationName.includes(searchValue.trim());
+    });
+  }, [initialConversations, searchValue]);
+
   const conversationsContent = conversations?.map(
     (conversation: Conversation) => (
       <ConversationBox key={conversation._id} conversation={conversation} />
@@ -26,7 +38,7 @@ export default function ConversationsList({
     <div className={styles["conversations-list"]}>
       <div className={styles["conversations-list-content"]}>
         <h2 className={styles.heading}>Conversations</h2>
-        <input className={styles.searchbar} placeholder="Search in messenger" />
+        <Searchbar onChange={(value: string) => setSearchValue(value)} />
         <ul>{isLoading ? skeletonContent : conversationsContent}</ul>
       </div>
       <hr />

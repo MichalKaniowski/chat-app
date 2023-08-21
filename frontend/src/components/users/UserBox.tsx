@@ -2,15 +2,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../types/database";
 import styles from "./UserBox.module.css";
+import getAuthorizationHeader from "../../utils/getAuthorizationHeader";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
 
   async function conversationCreateHandler() {
-    const token = sessionStorage.getItem("token");
-    const refreshToken = sessionStorage.getItem("refreshToken");
-
-    navigate(`/conversations/dfjadsfk`, {
+    navigate(`/conversations/loading-state`, {
       state: { message: "loading" },
     });
 
@@ -19,7 +17,7 @@ export default function UserBox({ user }: { user: User }) {
       { id: user._id },
       {
         headers: {
-          Authorization: `Bearer ${token}, Basic ${refreshToken}`,
+          Authorization: getAuthorizationHeader(),
         },
       }
     );

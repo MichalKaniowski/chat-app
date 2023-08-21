@@ -6,6 +6,7 @@ import DesktopSidebar from "../components/navigation/DesktopSidebar";
 import EmptyState from "../components/EmptyState";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
+import getAuthorizationHeader from "../utils/getAuthorizationHeader";
 
 export default function UsersPage() {
   const token = sessionStorage.getItem("token") as string;
@@ -18,7 +19,9 @@ export default function UsersPage() {
 
   async function getUsers() {
     try {
-      const response = await axios.get("http://localhost:3000/users");
+      const response = await axios.get("http://localhost:3000/users", {
+        headers: { Authorization: getAuthorizationHeader() },
+      });
 
       const users: User[] = response.data.filter(
         (user: User) => user.email !== decodedToken.email
