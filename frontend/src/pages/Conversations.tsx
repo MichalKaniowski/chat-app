@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import DesktopSidebar from "../components/navigation/DesktopSidebar";
 import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
 import { useLocation } from "react-router-dom";
@@ -9,9 +8,11 @@ import { Conversation as ConversationType, Message } from "../types/database";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import Navigation from "../components/navigation/Navigation";
 
 export default function ConversationsPage() {
   const { state } = useLocation();
+  const [isScreenBig, setIsScreenBig] = useState(false);
   const [activeConversation, setActiveConversation] =
     useState<ConversationType>(state);
 
@@ -32,6 +33,18 @@ export default function ConversationsPage() {
       staleTime: 60 * 1000, // 1min
     }
   );
+
+  useEffect(() => {
+    function updateScreenSize() {
+      setIsScreenBig(window.innerWidth >= 600);
+    }
+
+    updateScreenSize();
+    window.addEventListener("resize", updateScreenSize);
+    return () => {
+      window.removeEventListener("resize", updateScreenSize);
+    };
+  }, []);
 
   useEffect(() => {
     setActiveConversation(state);
@@ -89,20 +102,23 @@ export default function ConversationsPage() {
   }
 
   return (
-    <DesktopSidebar>
-      <ConversationsList
-        conversations={conversations}
-        isLoading={conversationsIsLoading}
-      />
+    <Navigation>
+      {(!state || isScreenBig) && (
+        <ConversationsList
+          conversations={conversations}
+          isLoading={conversationsIsLoading}
+        />
+      )}
       {state ? (
         <Conversation
           conversation={activeConversation || state}
           onMessageAdd={addMessageHandler}
           isLoading={conversationIsLoading || state?.message === "loading"}
+          isScreenBig={isScreenBig}
         />
       ) : (
         <EmptyState />
       )}
-    </DesktopSidebar>
+    </Navigation>
   );
 }

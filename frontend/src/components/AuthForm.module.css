@@ -12,10 +12,9 @@
   background-color: #fff;
   padding: 20px 30px;
   border-radius: 10px;
-  min-width: 300px;
-  width: 25%;
+  min-width: 280px;
+  width: 60%;
   max-width: 400px;
-  /* min-height: 450px; */
 }
 
 button {
@@ -91,4 +90,20 @@ label {
   border: none;
   text-decoration: underline;
   letter-spacing: 0.5px;
+}
+
+@media screen and (max-width: 550px) {
+  .form-container {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .already-user p {
+    flex: 1;
+  }
+
+  .change-action-button {
+    flex: 1;
+  }
 }

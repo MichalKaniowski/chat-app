@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./DesktopSidebar.module.css";
 import { BsFillPeopleFill, BsFillChatDotsFill } from "react-icons/bs";
 import { CgLogOut } from "react-icons/cg";

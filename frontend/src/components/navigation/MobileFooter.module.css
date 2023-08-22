@@ -1,0 +1,27 @@
+.container {
+  position: relative;
+  height: 100vh;
+}
+
+.footer {
+  height: 50px;
+  position: relative;
+  z-index: 10;
+  -webkit-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
+  -moz-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
+  box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.logout-button {
+  background-color: inherit;
+  border: none;
+}
+
+@media screen and (min-width: 600px) {
+  .container {
+    display: none;
+  }
+}

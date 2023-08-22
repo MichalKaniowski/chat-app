@@ -2,11 +2,11 @@ import UsersList from "../components/users/UsersList";
 import { User, Token } from "../types/database";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
-import DesktopSidebar from "../components/navigation/DesktopSidebar";
 import EmptyState from "../components/EmptyState";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import Navigation from "../components/navigation/Navigation";
 
 export default function UsersPage() {
   const token = sessionStorage.getItem("token") as string;
@@ -34,9 +34,9 @@ export default function UsersPage() {
   }
 
   return (
-    <DesktopSidebar>
+    <Navigation>
       <UsersList users={users!} isLoading={isLoading} />
       <EmptyState />
-    </DesktopSidebar>
+    </Navigation>
   );
 }

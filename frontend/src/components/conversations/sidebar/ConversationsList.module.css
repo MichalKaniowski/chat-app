@@ -4,6 +4,7 @@
 
 .conversations-list-content {
   width: 20vw;
+  min-width: 200px;
   overflow-y: auto;
 }
 
@@ -18,4 +19,10 @@
   border: 1px solid black;
   width: 90%;
   margin-bottom: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .conversations-list-content {
+    width: 100%;
+  }
 }

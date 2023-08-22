@@ -8,17 +8,23 @@ import toast from "react-hot-toast";
 import ConversationSkeleton from "../../skeletons/ConversationSkeleton";
 import getConversationName from "../../../utils/getConversationName";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 interface ConversationProps {
   conversation: Conversation;
-  onMessageAdd: (messageId: Message) => void;
   isLoading: boolean;
+  isScreenBig: boolean;
+  onMessageAdd: (messageId: Message) => void;
+  onConversationStateChange?: (stage: boolean) => void;
 }
 
 export default function ConversationComponent({
   conversation,
-  onMessageAdd,
   isLoading,
+  isScreenBig,
+  onMessageAdd,
+  onConversationStateChange,
 }: ConversationProps) {
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
@@ -30,6 +36,10 @@ export default function ConversationComponent({
   const messages = conversation?.messageIds as Message[];
 
   const conversationName = getConversationName(conversation);
+
+  if (onConversationStateChange) {
+    onConversationStateChange(true);
+  }
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -77,9 +87,22 @@ export default function ConversationComponent({
     <div className={styles.conversation}>
       <div className={styles.header}>
         <div className={styles["header-content"]}>
+          {!isScreenBig && (
+            <Link
+              to="/conversations"
+              onClick={() =>
+                onConversationStateChange && onConversationStateChange(false)
+              }
+            >
+              <AiOutlineArrowLeft
+                size={24}
+                style={{ color: "rgb(0, 132, 255)" }}
+              />
+            </Link>
+          )}
           <img src={imgSrc} className={styles["conversation-img"]} />
           <div>
-            <h3>{conversationName}</h3>
+            <h3 className={styles["conversation-name"]}>{conversationName}</h3>
             <p>Active</p>
           </div>
         </div>
