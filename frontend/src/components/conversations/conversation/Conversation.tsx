@@ -1,16 +1,17 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./Conversation.module.css";
 import { IoMdSend } from "react-icons/io";
 import jwtDecode from "jwt-decode";
 import { Token, Conversation, User, Message } from "../../../types/database";
 import axios from "axios";
-import toast from "react-hot-toast";
 import ConversationSkeleton from "../../skeletons/ConversationSkeleton";
 import getConversationName from "../../../utils/getConversationName";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import ConversationsContext from "../../../store/ConversationsProvider";
+import { BsImages } from "react-icons/bs";
+import toast from "react-hot-toast";
 
 interface ConversationProps {
   conversation: Conversation;
@@ -25,6 +26,25 @@ export default function ConversationComponent({
   isScreenBig,
   onMessageAdd,
 }: ConversationProps) {
+  const [uploadedImage, setUploadedImage] = useState("");
+
+  useEffect(() => {
+    const imageInput = document.getElementById(
+      "image-input"
+    ) as HTMLInputElement;
+
+    imageInput?.addEventListener("change", (e) => {
+      const file = imageInput.files![0];
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const imgUrl = e.target?.result as string;
+        setUploadedImage(imgUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
   const conversationsContent = useContext(ConversationsContext);
   conversationsContent.onConversationStateChange(true);
 
@@ -45,35 +65,76 @@ export default function ConversationComponent({
 
   async function messageCreateHandler(e: React.FormEvent) {
     e.preventDefault();
-    try {
-      const author = users.find((user: User) => user.email === email)!;
 
-      const body = messageRef.current.value;
-      const image = author.image || "/images/person-placeholder.png";
-      const authorId = author._id;
-      const conversationId = conversation._id;
+    const imageInput = document.getElementById(
+      "image-input"
+    ) as HTMLInputElement;
+    if (imageInput.files!.length > 0) {
+      const file = imageInput.files![0];
+      const reader = new FileReader();
 
-      const res = await axios.post(
-        "http://localhost:3000/messages",
-        {
-          body,
-          image,
-          authorId,
-          conversationId,
-        },
-        {
-          headers: {
-            Authorization: getAuthorizationHeader(),
+      reader.onload = async function (e: any) {
+        const content = e.target.result;
+
+        const author = users.find((user: User) => user.email === email)!;
+        const image = author.image || "/images/person-placeholder.png";
+
+        const res = await axios.post(
+          "http://localhost:3000/messages",
+          {
+            body: content,
+            isBodyAnImage: true,
+            image: image,
+            authorId: author._id,
+            conversationId: conversation._id,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: getAuthorizationHeader(),
+            },
+          }
+        );
 
-      const message = await res.data;
-      onMessageAdd(message);
+        const message = await res.data;
+        onMessageAdd(message);
+        imageInput.value = "";
+        setUploadedImage("");
+      };
+      reader.readAsDataURL(file);
+    } else {
+      try {
+        const author = users.find((user: User) => user.email === email)!;
 
-      messageRef.current.value = "";
-    } catch {
-      toast.error("Something went wrong");
+        const body = messageRef.current.value;
+        const image = author.image || "/images/person-placeholder.png";
+        const authorId = author._id;
+        const conversationId = conversation._id;
+
+        const res = await axios.post(
+          "http://localhost:3000/messages",
+          {
+            body,
+            isBodyAnImage: false,
+            image,
+            authorId,
+            conversationId,
+          },
+          {
+            headers: {
+              Authorization: getAuthorizationHeader(),
+            },
+          }
+        );
+
+        console.log(res?.status);
+
+        const message = await res.data;
+        onMessageAdd(message);
+
+        messageRef.current.value = "";
+      } catch {
+        toast.error("Something went wrong");
+      }
     }
   }
 
@@ -111,12 +172,13 @@ export default function ConversationComponent({
         <div className={styles.body}>
           <ul className={styles.messages}>
             {messages.map((message: Message, index: number) => {
-              const author = message.authorId as User;
-              const isPersonAnAuthor = id === author._id;
+              const isMessageAnImage = message?.isBodyAnImage;
+              const author = message?.authorId as User;
+              const isPersonAnAuthor = id === author?._id;
 
               return (
                 <li
-                  key={message._id}
+                  key={message?._id}
                   className={styles.message}
                   style={{ marginTop: index === 0 ? "10px" : "0" }}
                 >
@@ -128,13 +190,13 @@ export default function ConversationComponent({
                     }}
                   >
                     <img
-                      src={message.image}
+                      src={message?.image}
                       className={styles["message-avatar"]}
                       alt="User avatar"
                     />
                     <div>
                       <p className={styles["message-author"]}>
-                        {author.username}
+                        {author?.username}
                       </p>
                       <div
                         className={styles["message-background"]}
@@ -145,7 +207,14 @@ export default function ConversationComponent({
                           color: isPersonAnAuthor ? "white" : "black",
                         }}
                       >
-                        <p>{message.body}</p>
+                        {isMessageAnImage ? (
+                          <img
+                            src={message?.body}
+                            style={{ width: "100px", height: "100px" }}
+                          />
+                        ) : (
+                          <p>{message?.body}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -167,12 +236,26 @@ export default function ConversationComponent({
           onSubmit={messageCreateHandler}
           className={styles["message-form"]}
         >
+          <label htmlFor="image-input" className={styles["custom-file-upload"]}>
+            <BsImages size={28} />
+          </label>
+          <input
+            id="image-input"
+            type="file"
+            className={styles["message-form-button"]}
+          />
+          {uploadedImage && (
+            <img
+              src={uploadedImage}
+              style={{ width: "40px", height: "40px" }}
+            />
+          )}
           <input
             ref={messageRef}
             placeholder="Send a message"
             className={styles["message-input"]}
           />
-          <button className={styles["send-message"]}>
+          <button className={styles["message-form-button"]}>
             <IoMdSend size={28} />
           </button>
         </form>

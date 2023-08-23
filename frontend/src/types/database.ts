@@ -34,6 +34,7 @@ export interface Conversation {
 export interface Message {
   _id: string;
   body: string;
+  isBodyAnImage: boolean;
   image: string;
   authorId: string | User;
   conversationId: string | Conversation;

@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const testRoutes = require("./routes/testRoutes");
 
 require("dotenv").config();
 
@@ -14,11 +15,12 @@ mongoose.connect(process.env.MONGO_URL);
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "500kb" }));
 
 app.use("/users", userRoutes);
 app.use("/conversations", conversationRoutes);
 app.use("/messages", messageRoutes);
+app.use("/test", testRoutes);
 
 mongoose.connection.once("open", () => console.log("Connected to database"));
 mongoose.connection.on("error", (error) =>

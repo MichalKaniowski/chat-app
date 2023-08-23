@@ -86,17 +86,26 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  cursor: pointer;
+  color: #0084ff;
 }
 
 .message-input {
-  width: 97%;
+  width: 90%;
   padding: 8px 15px;
   border-radius: 5px;
   border: 1px solid black;
 }
 
-.send-message {
+.message-form-button {
   background-color: inherit;
   border: none;
   cursor: pointer;

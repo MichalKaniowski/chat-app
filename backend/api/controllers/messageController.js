@@ -2,7 +2,7 @@ const Message = require("../models/Message");
 
 async function createMessage(req, res) {
   try {
-    const { body, image, authorId, conversationId } = req.body;
+    const { body, isBodyAnImage, image, authorId, conversationId } = req.body;
 
     if (!body || !image || !authorId || !conversationId) {
       return res.status(400).json({ message: "Invalid data" });
@@ -10,6 +10,7 @@ async function createMessage(req, res) {
 
     let message = await Message.create({
       body,
+      isBodyAnImage,
       image,
       authorId,
       conversationId,
