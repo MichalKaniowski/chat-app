@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import styles from "./Conversation.module.css";
 import { IoMdSend } from "react-icons/io";
 import jwtDecode from "jwt-decode";
@@ -10,13 +10,13 @@ import getConversationName from "../../../utils/getConversationName";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import ConversationsContext from "../../../store/ConversationsProvider";
 
 interface ConversationProps {
   conversation: Conversation;
   isLoading: boolean;
   isScreenBig: boolean;
   onMessageAdd: (messageId: Message) => void;
-  onConversationStateChange?: (stage: boolean) => void;
 }
 
 export default function ConversationComponent({
@@ -24,8 +24,10 @@ export default function ConversationComponent({
   isLoading,
   isScreenBig,
   onMessageAdd,
-  onConversationStateChange,
 }: ConversationProps) {
+  const conversationsContent = useContext(ConversationsContext);
+  conversationsContent.onConversationStateChange(true);
+
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
   const token = sessionStorage.getItem("token") as string;
@@ -36,10 +38,6 @@ export default function ConversationComponent({
   const messages = conversation?.messageIds as Message[];
 
   const conversationName = getConversationName(conversation);
-
-  if (onConversationStateChange) {
-    onConversationStateChange(true);
-  }
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -91,7 +89,7 @@ export default function ConversationComponent({
             <Link
               to="/conversations"
               onClick={() =>
-                onConversationStateChange && onConversationStateChange(false)
+                conversationsContent.onConversationStateChange(false)
               }
             >
               <AiOutlineArrowLeft

@@ -3,14 +3,15 @@ import { BsFillPeopleFill, BsFillChatDotsFill } from "react-icons/bs";
 import { CgLogOut } from "react-icons/cg";
 import { Link, useLocation } from "react-router-dom";
 import { logoutUser } from "../../utils/logoutUser";
+import { useContext } from "react";
+import ConversationsContext from "../../store/ConversationsProvider";
 
 export default function MobileFooter({
   children,
-  isConversationOpen,
 }: {
   children: React.ReactNode;
-  isConversationOpen: boolean;
 }) {
+  const { isConversationOpen } = useContext(ConversationsContext);
   const { pathname } = useLocation();
 
   const displayFooter = pathname.includes("users") || !isConversationOpen;
@@ -32,9 +33,9 @@ export default function MobileFooter({
           <Link to="/conversations">
             <BsFillChatDotsFill size={28} style={{ color: "#000" }} />
           </Link>
-          <button onClick={logoutUser} className={styles["logout-button"]}>
+          <Link to="/" onClick={logoutUser}>
             <CgLogOut size={28} style={{ color: "#000" }} />
-          </button>
+          </Link>
         </div>
       )}
     </div>
