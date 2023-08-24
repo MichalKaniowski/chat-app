@@ -16,7 +16,9 @@ async function getConversations(req, res) {
     const populatedConversations = [];
 
     for (const conversation of conversations) {
-      const populatedConversation = await conversation.populate("userIds");
+      const populatedConversation = await conversation.populate(
+        "userIds messageIds"
+      );
       populatedConversations.push(populatedConversation);
     }
 
@@ -93,4 +95,42 @@ async function getConversation(req, res) {
   }
 }
 
-module.exports = { getConversations, createConversation, getConversation };
+async function updateSeenInConversation(req, res) {
+  try {
+    const { id: userId } = req?.userData;
+    const { conversationId } = req.params;
+
+    if (!conversationId) {
+      return res.status(400).json({ message: "ConversationId is required." });
+    }
+
+    const conversation = await Conversation.findOne({ _id: conversationId });
+    const user = await User.findOne({ _id: userId });
+
+    const messageIds = conversation.messageIds;
+    const messageIdsToAdd = [];
+
+    for (const messageId of messageIds) {
+      if (!user.seenMessageIds.includes(messageId)) {
+        messageIdsToAdd.push(messageId);
+      }
+    }
+
+    user.seenMessageIds = [...user.seenMessageIds, ...messageIdsToAdd];
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Succesfully updated seenMessageIds in user model." });
+  } catch (error) {
+    console.log(2);
+    res.status(400).json({ message: "Invalid conversation id" });
+  }
+}
+
+module.exports = {
+  getConversations,
+  createConversation,
+  getConversation,
+  updateSeenInConversation,
+};

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
@@ -91,7 +91,7 @@ export default function ConversationsPage() {
     }
   }
 
-  function addMessageHandler(message: Message) {
+  const addMessageHandler = useCallback((message: Message) => {
     setActiveConversation((prevConversation: ConversationType) => {
       const messages = (prevConversation.messageIds as Message[]).filter(
         (message) => message._id !== "fake-message"
@@ -104,7 +104,7 @@ export default function ConversationsPage() {
 
       return newConversation;
     });
-  }
+  }, []);
 
   return (
     <Navigation>
@@ -116,7 +116,7 @@ export default function ConversationsPage() {
       )}
       {state ? (
         <Conversation
-          conversation={activeConversation || state}
+          conversation={activeConversation}
           onMessageAdd={addMessageHandler}
           isLoading={conversationIsLoading || state?.message === "loading"}
           isScreenBig={isScreenBig}

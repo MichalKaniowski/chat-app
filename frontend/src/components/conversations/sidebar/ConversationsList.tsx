@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import styles from "./ConversationsList.module.css";
 import ConversationBox from "./ConversationBox";
 import { Conversation } from "../../../types/database";
@@ -11,7 +11,7 @@ interface ConversationListProps {
   isLoading: boolean;
 }
 
-export default function ConversationsList({
+function ConversationsList({
   conversations: initialConversations,
   isLoading,
 }: ConversationListProps) {
@@ -45,3 +45,5 @@ export default function ConversationsList({
     </div>
   );
 }
+
+export default React.memo(ConversationsList);

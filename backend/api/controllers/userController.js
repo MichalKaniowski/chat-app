@@ -136,7 +136,7 @@ async function createAccessToken(req, res) {
       { expiresIn: "1h" }
     );
 
-    return res.status(201).json(token);
+    res.status(201).json(token);
   } catch (error) {
     res.status(401).json("Invalid or no token.");
   }

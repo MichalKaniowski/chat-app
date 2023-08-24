@@ -12,11 +12,11 @@ import { Link } from "react-router-dom";
 import { IoMdSend } from "react-icons/io";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import ConversationsContext from "../../../store/ConversationsProvider";
-import Message from "./Message";
 import { BsImages } from "react-icons/bs";
 import toast from "react-hot-toast";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import axios from "axios";
+import Message from "./Message";
 
 interface ConversationContentProps {
   conversation: Conversation;
@@ -37,7 +37,7 @@ export default function ConversationContent({
       "image-input"
     ) as HTMLInputElement;
 
-    imageInput?.addEventListener("change", (e) => {
+    function imageChangeHandler() {
       const file = imageInput.files![0];
       const reader = new FileReader();
 
@@ -46,12 +46,38 @@ export default function ConversationContent({
         setUploadedImage(imgUrl);
       };
       reader.readAsDataURL(file);
-    });
+    }
+
+    imageInput?.addEventListener("change", imageChangeHandler);
+
+    return () => {
+      imageInput.removeEventListener("change", imageChangeHandler);
+    };
   }, []);
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
-  }, [conversation]);
+
+    async function updateSeenInConversation() {
+      if (!conversation?._id) return;
+
+      if (
+        (conversation.messageIds as MessageType[]).find(
+          (message) => message._id === "fake-message"
+        )
+      ) {
+        return;
+      }
+
+      await axios.post(
+        `http://localhost:3000/conversations/${conversation._id}/seen`,
+        {},
+        { headers: { Authorization: getAuthorizationHeader() } }
+      );
+    }
+
+    updateSeenInConversation();
+  }, [conversation.messageIds]);
 
   const conversationContext = useContext(ConversationsContext);
   conversationContext.onConversationStateChange(true);
@@ -92,17 +118,18 @@ export default function ConversationContent({
 
           // adding fake message, so there is no loading after sending a message
           // once real message is created this message will be removed
+          imageInput.value = "";
           onMessageAdd({
             _id: "fake-message",
             body: content,
             isBodyAnImage: true,
             image: image,
-            authorId: author._id,
+            authorId: author,
             conversationId: conversation._id,
             seenIds: [],
           });
-
           setIsSending(true);
+
           const res = await axios.post(
             "http://localhost:3000/messages",
             {
@@ -122,7 +149,6 @@ export default function ConversationContent({
           setIsSending(false);
           const message = await res.data;
           onMessageAdd(message);
-          imageInput.value = "";
           setUploadedImage("");
         };
 
@@ -160,6 +186,7 @@ export default function ConversationContent({
           conversationId,
           seenIds: [],
         });
+        messageRef.current.value = "";
 
         setIsSending(true);
         const res = await axios.post(
@@ -181,8 +208,6 @@ export default function ConversationContent({
         setIsSending(false);
         const message = await res.data;
         onMessageAdd(message);
-
-        messageRef.current.value = "";
       } catch {
         toast.error("Something went wrong");
       }

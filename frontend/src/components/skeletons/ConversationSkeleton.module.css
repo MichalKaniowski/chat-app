@@ -49,8 +49,10 @@
 }
 
 .message-input {
-  width: 106%;
-  padding: 8px 15px;
+  width: 95%;
+}
+
+.message-input-skeleton {
+  padding: 4px;
   border-radius: 5px;
-  border: 1px solid black;
 }

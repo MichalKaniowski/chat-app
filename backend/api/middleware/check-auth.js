@@ -14,22 +14,32 @@ module.exports = async (req, res, next) => {
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      const response = await axios.post("http://localhost:3000/users/token", {
-        refreshToken: refreshToken,
-      });
+      try {
+        const response = await axios.post("http://localhost:3000/users/token", {
+          refreshToken: refreshToken,
+        });
 
-      const token = response.data;
-      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const token = response.data;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-      if (token) {
-        req.token = token;
-        req.userData = decoded;
-        return next();
+        if (token) {
+          req.token = token;
+          req.userData = decoded;
+          return next();
+        }
+        res.status(401).json({
+          message:
+            "Invalid token or no token passed. Add authorization header with: Bearer <token>",
+        });
+      } catch (error) {
+        res
+          .status(401)
+          .json(
+            "Invalid token or no token passed. Add authorization header with: Bearer <token>"
+          );
       }
+    } else {
+      res.status(401).json("Invalid token");
     }
-    res.status(401).json({
-      message:
-        "Invalid token or no token passed. Add authorization header with: Bearer <token>",
-    });
   }
 };

@@ -38,8 +38,9 @@ export default function ConversationSkeleton() {
       <div className={styles.footer}>
         <hr />
         <form className={styles["message-form"]}>
-          <p>
-            <Skeleton className={styles["message-input"]} />
+          <Skeleton style={{ width: "34px", height: "34px" }} />
+          <p className={styles["message-input"]}>
+            <Skeleton className={styles["message-input-skeleton"]} />
           </p>
           <Skeleton circle style={{ width: "34px", height: "34px" }} />
         </form>

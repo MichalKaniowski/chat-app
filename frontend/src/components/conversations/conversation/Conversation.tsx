@@ -1,3 +1,4 @@
+import React from "react";
 import { Conversation, Message as MessageType } from "../../../types/database";
 import ConversationSkeleton from "../../skeletons/ConversationSkeleton";
 import ConversationContent from "./ConversationContent";
@@ -9,7 +10,7 @@ interface ConversationProps {
   onMessageAdd: (message: MessageType) => void;
 }
 
-export default function ConversationComponent({
+function ConversationComponent({
   conversation,
   isLoading,
   isScreenBig,
@@ -27,3 +28,5 @@ export default function ConversationComponent({
     />
   );
 }
+
+export default React.memo(ConversationComponent);
