@@ -4,9 +4,9 @@ import jwtDecode from "jwt-decode";
 
 export default function Message({ message }: { message: MessageType }) {
   const token = sessionStorage.getItem("token") as string;
-  const { id } = jwtDecode(token) as Token;
+  const { email } = jwtDecode(token) as Token;
   const author = message?.authorId as User;
-  const isPersonAnAuthor = id === author?._id;
+  const isPersonAnAuthor = email === author?.email;
 
   return (
     <li key={message?._id} className={styles.message}>
@@ -23,7 +23,9 @@ export default function Message({ message }: { message: MessageType }) {
           alt="User avatar"
         />
         <div>
-          <p className={styles["message-author"]}>{author?.username}</p>
+          <p className={styles["message-author"]} style={{}}>
+            {author?.username}
+          </p>
           <div
             className={styles["message-background"]}
             style={{
@@ -37,7 +39,8 @@ export default function Message({ message }: { message: MessageType }) {
                 style={{ width: "100px", height: "100px" }}
               />
             ) : (
-              <p>{message?.body}</p>
+              // <p></p>
+              <p className={styles["message-body"]}>{message?.body}</p>
             )}
           </div>
         </div>

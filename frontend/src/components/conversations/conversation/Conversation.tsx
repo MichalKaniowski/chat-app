@@ -17,7 +17,7 @@ export default function ConversationComponent({
 }: ConversationProps) {
   if (!conversation) return null;
 
-  const content = isLoading ? (
+  return isLoading ? (
     <ConversationSkeleton />
   ) : (
     <ConversationContent
@@ -26,6 +26,4 @@ export default function ConversationComponent({
       onMessageAdd={onMessageAdd}
     />
   );
-
-  return content;
 }

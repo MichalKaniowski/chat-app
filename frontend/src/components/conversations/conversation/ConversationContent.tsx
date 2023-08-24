@@ -29,6 +29,7 @@ export default function ConversationContent({
   isScreenBig,
   onMessageAdd,
 }: ConversationContentProps) {
+  const [isSending, setIsSending] = useState(false);
   const [uploadedImage, setUploadedImage] = useState("");
 
   useEffect(() => {
@@ -89,6 +90,19 @@ export default function ConversationContent({
           const author = users.find((user: User) => user.email === email)!;
           const image = author.image || "/images/person-placeholder.png";
 
+          // adding fake message, so there is no loading after sending a message
+          // once real message is created this message will be removed
+          onMessageAdd({
+            _id: "fake-message",
+            body: content,
+            isBodyAnImage: true,
+            image: image,
+            authorId: author._id,
+            conversationId: conversation._id,
+            seenIds: [],
+          });
+
+          setIsSending(true);
           const res = await axios.post(
             "http://localhost:3000/messages",
             {
@@ -105,6 +119,7 @@ export default function ConversationContent({
             }
           );
 
+          setIsSending(false);
           const message = await res.data;
           onMessageAdd(message);
           imageInput.value = "";
@@ -134,6 +149,19 @@ export default function ConversationContent({
           return;
         }
 
+        // adding fake message, so there is no loading after sending a message
+        // once real message is created this message will be removed
+        onMessageAdd({
+          _id: "fake-message",
+          body,
+          isBodyAnImage: false,
+          image,
+          authorId: author,
+          conversationId,
+          seenIds: [],
+        });
+
+        setIsSending(true);
         const res = await axios.post(
           "http://localhost:3000/messages",
           {
@@ -150,8 +178,7 @@ export default function ConversationContent({
           }
         );
 
-        console.log(res?.status);
-
+        setIsSending(false);
         const message = await res.data;
         onMessageAdd(message);
 
@@ -217,6 +244,7 @@ export default function ConversationContent({
             type="file"
             accept=".jpg, .jpeg, .png"
             className={styles["message-form-button"]}
+            disabled={isSending}
           />
           {uploadedImage && (
             <img
@@ -228,6 +256,7 @@ export default function ConversationContent({
             ref={messageRef}
             placeholder="Send a message"
             className={styles["message-input"]}
+            disabled={isSending}
           />
           <button className={styles["message-form-button"]}>
             <IoMdSend size={28} />

@@ -12,10 +12,10 @@
   width: calc(90% - 50px);
 }
 
-h2 {
+.username {
   width: 60%;
 }
 
-p {
+.last-message {
   width: 90%;
 }

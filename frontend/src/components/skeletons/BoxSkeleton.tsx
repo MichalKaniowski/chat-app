@@ -9,10 +9,10 @@ export default function BoxSkeleton() {
         <Skeleton circle width={50} height={50} />
       </div>
       <div className={styles["right-column"]}>
-        <h2>
+        <h2 className={styles.username}>
           <Skeleton />
         </h2>
-        <p>
+        <p className={styles["last-message"]}>
           <Skeleton />
         </p>
       </div>

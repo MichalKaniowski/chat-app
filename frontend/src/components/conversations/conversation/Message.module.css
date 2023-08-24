@@ -26,13 +26,20 @@
 
 .message-background {
   position: relative;
-  z-index: 1;
-  padding: 5px 12px;
+  padding: 10px;
   border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .message-author {
   font-size: 1.1rem;
   font-weight: 500;
   margin: -5px 0 5px;
+}
+
+.message-body {
+  max-width: 60ch;
+  word-break: break-word;
 }

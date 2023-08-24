@@ -93,10 +93,15 @@ export default function ConversationsPage() {
 
   function addMessageHandler(message: Message) {
     setActiveConversation((prevConversation: ConversationType) => {
+      const messages = (prevConversation.messageIds as Message[]).filter(
+        (message) => message._id !== "fake-message"
+      );
+
       const newConversation = {
         ...prevConversation,
-        messageIds: [...prevConversation.messageIds, message] as Message[],
+        messageIds: [...messages, message] as Message[],
       };
+
       return newConversation;
     });
   }
