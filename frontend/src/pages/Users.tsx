@@ -19,9 +19,12 @@ export default function UsersPage() {
 
   async function getUsers() {
     try {
-      const response = await axios.get("http://localhost:3000/users", {
-        headers: { Authorization: getAuthorizationHeader() },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/users`,
+        {
+          headers: { Authorization: getAuthorizationHeader() },
+        }
+      );
 
       const users: User[] = response.data.filter(
         (user: User) => user.email !== decodedToken.email

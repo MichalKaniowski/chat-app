@@ -70,7 +70,9 @@ export default function ConversationContent({
       }
 
       await axios.post(
-        `http://localhost:3000/conversations/${conversation._id}/seen`,
+        `${import.meta.env.VITE_API_BASE_URL}/conversations/${
+          conversation._id
+        }/seen`,
         {},
         { headers: { Authorization: getAuthorizationHeader() } }
       );
@@ -131,7 +133,7 @@ export default function ConversationContent({
           setIsSending(true);
 
           const res = await axios.post(
-            "http://localhost:3000/messages",
+            `${import.meta.env.VITE_API_BASE_URL}/messages`,
             {
               body: content,
               isBodyAnImage: true,
@@ -190,7 +192,7 @@ export default function ConversationContent({
 
         setIsSending(true);
         const res = await axios.post(
-          "http://localhost:3000/messages",
+          `${import.meta.env.VITE_API_BASE_URL}/messages`,
           {
             body,
             isBodyAnImage: false,

@@ -13,7 +13,7 @@ export default function UserBox({ user }: { user: User }) {
     });
 
     const conversation = await axios.post(
-      "http://localhost:3000/conversations",
+      `${import.meta.env.VITE_API_BASE_URL}/conversations`,
       { id: user._id },
       {
         headers: {

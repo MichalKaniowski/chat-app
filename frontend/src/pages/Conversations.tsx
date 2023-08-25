@@ -56,7 +56,7 @@ export default function ConversationsPage() {
     if (!conversationId) return null;
 
     const res = await axios.get(
-      `http://localhost:3000/conversations/${conversationId}`,
+      `${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}`,
       {
         headers: {
           Authorization: getAuthorizationHeader(),
@@ -71,11 +71,14 @@ export default function ConversationsPage() {
 
   async function getConversations() {
     try {
-      const res = await axios.get("http://localhost:3000/conversations", {
-        headers: {
-          Authorization: getAuthorizationHeader(),
-        },
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/conversations`,
+        {
+          headers: {
+            Authorization: getAuthorizationHeader(),
+          },
+        }
+      );
 
       const data = await res.data;
       const newAccessToken = data?.token;

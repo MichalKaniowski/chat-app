@@ -37,7 +37,7 @@ export default function ConversationBox({
       });
 
       const res = await axios.get(
-        `http://localhost:3000/conversations/${conversationId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}`,
         { headers: { Authorization: getAuthorizationHeader() } }
       );
 

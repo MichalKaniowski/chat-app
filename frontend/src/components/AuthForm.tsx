@@ -57,9 +57,9 @@ export default function AuthForm() {
 
     let url = "";
     if (formState === "register") {
-      url = "http://localhost:3000/users/signup";
+      url = `${import.meta.env.VITE_API_BASE_URL}/users/signup`;
     } else if (formState === "login") {
-      url = "http://localhost:3000/users/login";
+      url = `${import.meta.env.VITE_API_BASE_URL}/users/login`;
     }
 
     const user = await axios

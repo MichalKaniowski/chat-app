@@ -5,6 +5,8 @@ export async function logoutUser() {
   sessionStorage.removeItem("token");
   sessionStorage.removeItem("refreshToken");
   await axios.delete(
-    `http://localhost:3000/users/logout?refreshToken=${refreshToken}`
+    `${
+      import.meta.env.VITE_API_BASE_URL
+    }/users/logout?refreshToken=${refreshToken}`
   );
 }

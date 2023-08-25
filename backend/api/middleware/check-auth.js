@@ -15,9 +15,12 @@ module.exports = async (req, res, next) => {
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       try {
-        const response = await axios.post("http://localhost:3000/users/token", {
-          refreshToken: refreshToken,
-        });
+        const response = await axios.post(
+          `${process.env.API_BASE_URL}/users/token`,
+          {
+            refreshToken: refreshToken,
+          }
+        );
 
         const token = response.data;
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
