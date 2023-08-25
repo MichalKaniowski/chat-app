@@ -34,12 +34,17 @@ async function getConversations(req, res) {
 
 async function createConversation(req, res) {
   try {
+    console.log(0);
     const { id: targetUserId, name } = req.body;
+
+    console.log(1);
 
     const requestUserId = req.userData.id;
     if (!requestUserId || !targetUserId) {
       return res.status(400).json({ message: "Incorrect or missing data." });
     }
+
+    console.log(2);
 
     const conversations = await Conversation.find();
     const requestUserConversations = conversations.filter(
@@ -48,9 +53,13 @@ async function createConversation(req, res) {
         conversation.isGroup === false
     );
 
+    console.log(3);
+
     const existingConversation = requestUserConversations.find((conversation) =>
       conversation.userIds.includes(targetUserId)
     );
+
+    console.log(4);
 
     if (existingConversation) {
       const populatedExistingConversation = await existingConversation.populate(
@@ -63,24 +72,32 @@ async function createConversation(req, res) {
       return res.status(200).json(populatedExistingConversation);
     }
 
+    console.log(5);
+    console.log("here");
+
     let conversation = await Conversation.create({
-      name: name ? name : "",
+      name: name || "",
       userIds: [requestUserId, targetUserId],
     });
+
+    console.log(6);
 
     conversation = await conversation.populate([
       { path: "userIds", select: "-password" },
       { path: "messageIds", populate: { path: "authorId" } },
     ]);
+    console.log(7);
 
     res.status(201).json(conversation);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: "Invalid data" });
   }
 }
 
 async function getConversation(req, res) {
   try {
+    console.log("we're in getconversation");
     const conversationId = req.params.conversationId;
     const conversation = await Conversation.findOne({
       _id: conversationId,

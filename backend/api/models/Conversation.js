@@ -3,7 +3,7 @@ const User = require("./User");
 
 const conversationSchema = mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String },
     lastMessageAt: { type: Date },
     isGroup: { type: Boolean, default: false },
     image: { type: String, default: "" },
