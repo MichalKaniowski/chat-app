@@ -1,6 +1,6 @@
 [[redirects]]
   from = "/"
-  to: "/conversations"
+  to = "/conversations"
 [[redirects]]
   from = "/"
-  to: "/users"
+  to = "/users"
