@@ -43,3 +43,9 @@
   max-width: 60ch;
   word-break: break-word;
 }
+
+.message-body-image {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+}

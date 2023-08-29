@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
 import axios from "axios";
 import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
@@ -9,12 +9,16 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import getAuthorizationHeader from "../utils/getAuthorizationHeader";
 import Navigation from "../components/navigation/Navigation";
+import ModalContext from "../store/ModalProvider";
+import Modal from "../components/ui/ImageModal";
 
 export default function ConversationsPage() {
   const { state } = useLocation();
   const [isScreenBig, setIsScreenBig] = useState(false);
   const [activeConversation, setActiveConversation] =
     useState<ConversationType>(state);
+
+  const { isModalOpen, image } = useContext(ModalContext);
 
   const { isLoading: conversationIsLoading } = useQuery(
     ["conversation"],
@@ -111,6 +115,7 @@ export default function ConversationsPage() {
 
   return (
     <Navigation>
+      {isModalOpen && <Modal image={image} />}
       {(!state || isScreenBig) && (
         <ConversationsList
           conversations={conversations}

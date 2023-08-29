@@ -7,6 +7,7 @@ import UsersPage from "./pages/Users.tsx";
 import ConversationsPage from "./pages/Conversations.tsx";
 import Error from "./components/Error.tsx";
 import App from "./App.tsx";
+import { ModalContextProvider } from "./store/ModalProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+    <ModalContextProvider>
+      <RouterProvider router={router}></RouterProvider>
+    </ModalContextProvider>
   </React.StrictMode>
 );

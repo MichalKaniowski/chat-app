@@ -1,0 +1,62 @@
+.backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: black;
+  opacity: 0.95;
+}
+
+.modal {
+  position: absolute;
+  right: calc(50% - 225px);
+  top: calc(40% - 100px);
+}
+
+.image {
+  width: 450px;
+  height: 300px;
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background-color: inherit;
+  border: none;
+  color: #fff;
+}
+
+@media screen and (max-width: 500px) {
+  .image {
+    width: 300px;
+    height: 200px;
+  }
+
+  .modal {
+    right: calc(50% - 150px);
+    top: calc(50% - 100px);
+  }
+
+  .close-button {
+    right: -20px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .image {
+    width: 240px;
+    height: 160px;
+  }
+
+  .modal {
+    right: calc(50% - 125px);
+    top: calc(50% - 80px);
+  }
+
+  .close-button {
+    right: -10px;
+  }
+}

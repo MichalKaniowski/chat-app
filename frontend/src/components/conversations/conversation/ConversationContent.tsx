@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import axios from "axios";
 import Message from "./Message";
+import Modal from "../../ui/ImageModal";
 
 interface ConversationContentProps {
   conversation: Conversation;
@@ -79,7 +80,7 @@ export default function ConversationContent({
     }
 
     updateSeenInConversation();
-  }, [conversation.messageIds]);
+  }, [conversation.messageIds, conversation._id]);
 
   const conversationContext = useContext(ConversationsContext);
   conversationContext.onConversationStateChange(true);
