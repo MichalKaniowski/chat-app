@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   transports: ["websocket", "polling"],
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [process.env.API_BASE_URL],
   },
 });
 

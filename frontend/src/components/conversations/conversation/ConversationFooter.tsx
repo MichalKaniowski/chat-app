@@ -83,7 +83,7 @@ export default function ConversationFooter({
     setIsSending(true);
 
     const res = await axios.post(
-      `${process.env.VITE_API_BASE_URL}/upload`,
+      `${import.meta.env.VITE_API_BASE_URL}/messages/upload`,
       formData,
       {
         headers: {

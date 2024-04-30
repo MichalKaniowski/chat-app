@@ -1,8 +1,8 @@
 import { io } from "socket.io-client";
 // import getSession from "./getSession";
 
-const URL = process.env.VITE_API_BASE_URL as string;
-// const URL = import.meta.env.VITE_API_BASE_URL
+// https://chat-app-6lk7.onrender.com
+const URL = import.meta.env.VITE_API_BASE_URL as string;
 
 export const socket = io(URL, {
   transports: ["websocket", "polling"],
