@@ -33,8 +33,8 @@ export interface Conversation {
 
 export interface Message {
   _id: string;
-  body: string;
-  isBodyAnImage: boolean;
+  body?: string;
+  fileUrls?: string[];
   image: string;
   authorId: string | User;
   conversationId: string | Conversation;

@@ -2,11 +2,10 @@ const express = require("express");
 const router = express.Router();
 const checkAuth = require("../middleware/check-auth");
 const {
-  createMessage,
+  uploadFileMessage,
   deleteMessage,
 } = require("../controllers/messageController");
 
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 
 const storage = multer.memoryStorage();
@@ -26,17 +25,7 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024, files: 5 }, //25mb
 });
 
-// router.post("/upload", upload.array("file"), async (req, res) => {
-//   try {
-//     const results = await s3Uploadv3(req.files);
-//     console.log("RESULTS: ", results);
-//   } catch (error) {
-//     console.log("error occured: ", error);
-//   }
-// });
-
-router.post("/", checkAuth, upload.array("file"), createMessage);
-// router.post("/", checkAuth, createMessage);
+router.post("/upload/", checkAuth, upload.array("file"), uploadFileMessage);
 router.delete("/", checkAuth, deleteMessage);
 
 module.exports = router;

@@ -153,7 +153,7 @@ export default function ConversationsPage() {
 
   return (
     <Navigation>
-      {isModalOpen && <Modal image={file} />}
+      {isModalOpen && <Modal fileUrl={file} />}
       {(!state || isScreenBig) && (
         <ConversationsList
           conversations={conversations}

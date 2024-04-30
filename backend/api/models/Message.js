@@ -6,7 +6,7 @@ const messageSchema = mongoose.Schema(
   {
     body: { type: String, required: false },
     // isBodyAnImage: { type: Boolean, required: true },
-    fileUrls: { type: String, required: false }, // its present if file was sent, also body is undefined in this case
+    fileUrls: [{ type: String, required: false }], // its present if file was sent, also body is undefined in this case
     image: { type: String, required: true },
     authorId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     conversationId: {

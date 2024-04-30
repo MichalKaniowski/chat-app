@@ -1,5 +1,5 @@
 const Message = require("../models/Message");
-const { S3Client, newPutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const uuid = require("uuid").v4;
 
 const normalizeFilename = (filename) => {
@@ -12,6 +12,10 @@ const normalizeFilename = (filename) => {
 };
 
 const s3Uploadv3 = async (files) => {
+  if (files.length === 0) {
+    return { fileUrls: [] };
+  }
+
   const credentials = {
     region: process.env.S3_REGION,
     credentials: {
@@ -19,6 +23,7 @@ const s3Uploadv3 = async (files) => {
       secretAccessKey: process.env.S3_SECRET_KEY,
     },
   };
+
   const s3client = new S3Client(credentials);
 
   const fileUrls = [];
@@ -41,53 +46,42 @@ const s3Uploadv3 = async (files) => {
           fileUrls.push(filename);
           return res;
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log("ERROR: ", error);
+      }
     })
   );
 
   return { responses, fileUrls: fileUrls };
 };
 
-async function createMessage(req, res) {
+async function uploadFileMessage(req, res) {
   try {
-    // const { body, authorId, conversationId, image } = req.body;
-    // const {formData, }
-    console.log("NEW MESSAGE: ", req.body.newMessage);
-    console.log("FILES: ", req.files);
+    const { body, authorId, conversationId, image } = JSON.parse(
+      req.body?.newMessage
+    );
+    const files = req?.files ?? [];
 
-    //we will have body if message is text, and fileUrl if message is a file
-    if ((!req.files && !body) || authorId || !conversationId) {
+    if ((!files && !body) || !authorId || !conversationId) {
       return res.status(400).json({ message: "Invalid data" });
     }
 
-    let message;
+    const { fileUrls } = await s3Uploadv3(files); // if there are not files fileUrls will be []
 
-    if (body) {
-      message = await Message.create({
-        body,
-        image,
-        authorId,
-        conversationId,
-      });
-    } else {
-      const files = req.files;
-      const { fileUrls } = await s3Uploadv3(files);
-
-      console.log("got to uploading");
-
-      message = await Message.create({
-        fileUrls,
-        image,
-        authorId,
-        conversationId,
-      });
-    }
+    let message = await Message.create({
+      body,
+      fileUrls,
+      image,
+      authorId,
+      conversationId,
+      seenIds: [],
+    });
 
     message = await message.populate("authorId");
 
     res.status(201).json(message);
   } catch (error) {
-    console.log("GOT AN ERROR: ", error);
+    console.log("ERROR in uploadFileMessage: ", error);
     res.status(400).json({ message: "Invalid data" });
   }
 }
@@ -117,4 +111,4 @@ async function deleteMessage(req, res) {
   }
 }
 
-module.exports = { createMessage, deleteMessage };
+module.exports = { uploadFileMessage, deleteMessage };

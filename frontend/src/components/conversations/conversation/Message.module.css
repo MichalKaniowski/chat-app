@@ -28,9 +28,6 @@
   position: relative;
   padding: 10px;
   border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .message-author {
@@ -42,6 +39,7 @@
 .message-body {
   max-width: 60ch;
   word-break: break-word;
+  margin-bottom: 10px;
 }
 
 .message-body-image {

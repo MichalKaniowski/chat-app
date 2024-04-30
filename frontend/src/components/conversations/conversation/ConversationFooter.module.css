@@ -1,0 +1,43 @@
+.footer {
+  height: 45px;
+  position: relative;
+  z-index: 5;
+  background-color: #fff;
+}
+
+.message-form {
+  width: 100%;
+  padding: 6px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 10px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  cursor: pointer;
+  color: #0084ff;
+}
+
+.file-preview {
+  width: 40px;
+  height: 40px;
+}
+
+.message-input {
+  width: 90%;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+
+.message-form-button {
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+  color: #0084ff;
+}
