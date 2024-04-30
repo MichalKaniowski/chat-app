@@ -38,5 +38,5 @@ export interface Message {
   image: string;
   authorId: string | User;
   conversationId: string | Conversation;
-  seenIds: string[];
+  seenIds: string[] | User[];
 }

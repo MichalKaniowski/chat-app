@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import getConversationName from "../../../utils/getConversationName";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import jwtDecode from "jwt-decode";
+import { useEffect } from "react";
+import { socket } from "../../../utils/socket";
 
 export default function ConversationBox({
   conversation,
@@ -13,6 +15,19 @@ export default function ConversationBox({
   conversation: Conversation;
 }) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    function receiveMessageHandler(message: Message) {
+      // console.log(message);
+    }
+    if (conversation?._id) {
+      socket.emit("join-room", conversation._id);
+    }
+    socket.on("receive-message", receiveMessageHandler);
+    return () => {
+      socket.off("receive-message", receiveMessageHandler);
+    };
+  }, [socket]);
 
   const token = sessionStorage.getItem("token") as string;
   const { id } = jwtDecode(token) as Token;
@@ -26,22 +41,24 @@ export default function ConversationBox({
   const isAuthor = lastMessage?.authorId === id;
 
   const user = (conversation.userIds as User[]).find((user) => user._id === id);
-  const hasSeen = user?.seenMessageIds.includes(lastMessage?._id);
+  const hasSeen = user?.seenMessageIds.includes(lastMessage?._id) || isAuthor;
 
   const conversationName = getConversationName(conversation);
 
   async function getConversationHandler(conversationId: string) {
     try {
-      navigate(`/conversations/${conversationId}`, {
-        state: { message: "loading" },
-      });
-
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}`,
         { headers: { Authorization: getAuthorizationHeader() } }
       );
 
-      const conversation = await res.data;
+      const conversation = await res?.data;
+
+      if (!conversation) {
+        return toast.error(
+          "There was a problem while fetching this conversation"
+        );
+      }
 
       navigate(`/conversations/${conversation?._id}`, {
         state: conversation,

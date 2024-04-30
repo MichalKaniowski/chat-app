@@ -1,20 +1,21 @@
-import { useContext } from "react";
 import { Message as MessageType, Token, User } from "../../../types/database";
 import styles from "./Message.module.css";
 import jwtDecode from "jwt-decode";
-import ModalContext from "../../../store/ModalProvider";
+import { useFileModalContext } from "../../../hooks/context/useFileModalContext";
 
 interface MessageProps {
   message: MessageType;
 }
 
 export default function Message({ message }: MessageProps) {
-  const token = sessionStorage.getItem("token") as string;
-  const { email } = jwtDecode(token) as Token;
-  const author = message?.authorId as User;
-  const isPersonAnAuthor = email === author?.email;
+  const { onFileChange } = useFileModalContext();
 
-  const { onImageChange } = useContext(ModalContext);
+  const token = sessionStorage.getItem("token") as string;
+  const { id } = jwtDecode(token) as Token;
+
+  const author = message?.authorId as User;
+  const authorId = author._id;
+  const isPersonAnAuthor = id === authorId;
 
   return (
     <li key={message?._id} className={styles.message}>
@@ -45,7 +46,7 @@ export default function Message({ message }: MessageProps) {
               <img
                 src={message?.body}
                 className={styles["message-body-image"]}
-                onClick={() => onImageChange(message.body)}
+                onClick={() => onFileChange(message.body)}
               />
             ) : (
               <p className={styles["message-body"]}>{message?.body}</p>

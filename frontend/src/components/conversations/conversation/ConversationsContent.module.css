@@ -22,13 +22,19 @@
 }
 
 .body {
-  height: calc(100% - 72px - 45px - 10px);
+  height: calc(100% - 45px - 10px);
   padding: 0 10px;
   overflow-y: auto;
 }
 
 .messages {
   list-style: none;
+}
+
+.seen-by-text {
+  color: #595959;
+  font-size: 0.85rem;
+  margin-top: -15px;
 }
 
 .empty-conversation {

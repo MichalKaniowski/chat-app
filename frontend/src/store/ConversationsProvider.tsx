@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
-const ConversationsContext = React.createContext({
+interface ConversationContextType {
+  isConversationOpen: boolean;
+  onConversationOpenStateChange: (state: boolean) => void;
+}
+
+const ConversationsContext = React.createContext<ConversationContextType>({
   isConversationOpen: false,
-  onConversationStateChange: (state: boolean) => {},
+  onConversationOpenStateChange: () => {},
 });
 
 export default ConversationsContext;
@@ -14,17 +19,18 @@ export function ConversationsContextProvider({
 }) {
   const [isConversationOpen, setIsConversationOpen] = useState(false);
 
-  function changeConversationStateHandler(state: boolean) {
-    //waiting for component to render before updating state
+  const changeConversationStateHandler = useCallback((state: boolean) => {
+    // waiting for component to render before updating state
     setTimeout(() => {
       setIsConversationOpen(state);
     }, 0);
-  }
+  }, []);
+
   return (
     <ConversationsContext.Provider
       value={{
         isConversationOpen,
-        onConversationStateChange: changeConversationStateHandler,
+        onConversationOpenStateChange: changeConversationStateHandler,
       }}
     >
       {children}

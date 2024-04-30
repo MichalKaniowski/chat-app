@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import ModalContext from "../../store/ModalProvider";
+import { useFileModalContext } from "../../hooks/context/useFileModalContext";
 import styles from "./ImageModal.module.css";
 import { AiOutlineClose } from "react-icons/ai";
 
 export default function Modal({ image }: { image: string }) {
-  const { onModalClose } = useContext(ModalContext);
+  const { onModalClose } = useFileModalContext();
 
   return (
     <div className={styles.backdrop} onClick={onModalClose}>

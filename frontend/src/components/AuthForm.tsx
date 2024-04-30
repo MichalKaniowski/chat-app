@@ -5,6 +5,9 @@ import styles from "./AuthForm.module.css";
 import { AiOutlineGoogle, AiFillGithub } from "react-icons/ai";
 import Input from "./ui/Input";
 import toast from "react-hot-toast";
+import getSession from "../utils/getSession";
+import { socket } from "../utils/socket";
+import { Token } from "../types/database";
 
 type FormState = "register" | "login";
 
@@ -62,6 +65,7 @@ export default function AuthForm() {
       url = `${import.meta.env.VITE_API_BASE_URL}/users/login`;
     }
 
+    //todo: check whats happening here
     const user = await axios
       .post(url, {
         username,
@@ -71,6 +75,19 @@ export default function AuthForm() {
       .then((callback) => {
         sessionStorage.setItem("token", callback?.data?.token);
         sessionStorage.setItem("refreshToken", callback?.data?.refreshToken);
+
+        const data = getSession();
+        const decodedToken = data.decodedToken as Token;
+
+        axios
+          .patch(
+            `${import.meta.env.VITE_API_BASE_URL}/users/update-online-status`,
+            { id: decodedToken!.id, isOnline: true }
+          )
+          .then(() => {
+            socket.emit("user-connected", decodedToken);
+          });
+
         navigate("/users");
         toast.success(
           `Succesfully ${formState === "login" ? "logged in." : "signed up"}`

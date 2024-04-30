@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useState, useContext } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
+
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
+import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import { socket } from "../utils/socket";
+
 import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
-import { useLocation } from "react-router-dom";
-import Conversation from "../components/conversations/conversation/Conversation";
 import { Conversation as ConversationType, Message } from "../types/database";
-import toast from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
-import getAuthorizationHeader from "../utils/getAuthorizationHeader";
 import Navigation from "../components/navigation/Navigation";
-import ModalContext from "../store/ModalProvider";
 import Modal from "../components/ui/ImageModal";
+import Conversation from "../components/conversations/conversation/Conversation";
+import { useFileModalContext } from "../hooks/context/useFileModalContext";
 
 export default function ConversationsPage() {
   const { state } = useLocation();
@@ -18,34 +21,39 @@ export default function ConversationsPage() {
   const [activeConversation, setActiveConversation] =
     useState<ConversationType>(state);
 
-  const { isModalOpen, image } = useContext(ModalContext);
+  const { isModalOpen, file } = useFileModalContext();
 
   const { isLoading: conversationIsLoading } = useQuery(
     ["conversation"],
-    getAndSetNewestConversation,
-    {
-      cacheTime: 60 * 1000, // 1min
-      staleTime: 60 * 1000, // 1min
-    }
+    getAndSetNewestConversation
   );
 
-  const { isLoading: conversationsIsLoading, data: conversations } = useQuery(
-    ["conversations"],
-    getConversations,
-    {
-      cacheTime: 60 * 1000, // 1min
-      staleTime: 60 * 1000, // 1min
-    }
-  );
+  const {
+    isLoading: conversationsIsLoading,
+    data: conversations,
+    refetch: refetchConversations,
+  } = useQuery(["conversations"], getConversations);
 
   useEffect(() => {
     function updateScreenSize() {
       setIsScreenBig(window.innerWidth >= 600);
     }
+    async function receiveMessageHandler(message: Message) {
+      addMessageHandler(message);
+    }
 
+    async function receiveConversationHandler() {
+      refetchConversations();
+    }
+
+    socket.on("receive-message", receiveMessageHandler);
+    socket.on("receive-conversation", receiveConversationHandler);
     updateScreenSize();
     window.addEventListener("resize", updateScreenSize);
+
     return () => {
+      socket.off("receive-message", receiveMessageHandler);
+      socket.off("receive-conversation", receiveConversationHandler);
       window.removeEventListener("resize", updateScreenSize);
     };
   }, []);
@@ -67,7 +75,14 @@ export default function ConversationsPage() {
         },
       }
     );
-    const conversation = await res.data;
+
+    const conversation = await res?.data;
+
+    if (!conversation) {
+      return toast.error(
+        "There was a problem while fetching this conversation"
+      );
+    }
 
     setActiveConversation(conversation);
     return conversation;
@@ -91,31 +106,54 @@ export default function ConversationsPage() {
         sessionStorage.setItem("token", newAccessToken);
       }
 
-      const conversations = data.conversations;
+      const conversations = data?.conversations;
+
+      // empty array won't be caught here
+      if (!conversations) {
+        return toast.error(
+          "Something went wrong while fetching conversations."
+        );
+      }
+
       return conversations;
     } catch (error) {
       toast.error("Something went wrong while getting conversations.");
     }
   }
 
-  const addMessageHandler = useCallback((message: Message) => {
-    setActiveConversation((prevConversation: ConversationType) => {
-      const messages = (prevConversation.messageIds as Message[]).filter(
-        (message) => message._id !== "fake-message"
+  const addMessageHandler = useCallback(
+    async (message: Message) => {
+      // todo: think about using optimisticQuery or sth like that from tanstack query
+      if (activeConversation) {
+        setActiveConversation((prevConversation: ConversationType) => {
+          const messages = (prevConversation.messageIds as Message[]).filter(
+            (message) => message._id !== "fake-message"
+          );
+
+          const newConversation = {
+            ...prevConversation,
+            messageIds: [...messages, message] as Message[],
+          };
+
+          return newConversation;
+        });
+      }
+
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/conversations/${
+          message.conversationId
+        }/seen`,
+        {},
+        { headers: { Authorization: getAuthorizationHeader() } }
       );
-
-      const newConversation = {
-        ...prevConversation,
-        messageIds: [...messages, message] as Message[],
-      };
-
-      return newConversation;
-    });
-  }, []);
+      refetchConversations();
+    },
+    [activeConversation, refetchConversations]
+  );
 
   return (
     <Navigation>
-      {isModalOpen && <Modal image={image} />}
+      {isModalOpen && <Modal image={file} />}
       {(!state || isScreenBig) && (
         <ConversationsList
           conversations={conversations}

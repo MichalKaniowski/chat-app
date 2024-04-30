@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../types/database";
 import styles from "./UserBox.module.css";
 import getAuthorizationHeader from "../../utils/getAuthorizationHeader";
+import { socket } from "../../utils/socket";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function UserBox({ user }: { user: User }) {
       state: { message: "loading" },
     });
 
-    const conversation = await axios.post(
+    const res = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/conversations`,
       { id: user._id },
       {
@@ -22,10 +23,15 @@ export default function UserBox({ user }: { user: User }) {
       }
     );
 
+    const conversation = await res.data;
+
+    socket.emit("join-room", conversation._id);
+    socket.emit("create-conversation", conversation);
+
     // data passed to navigate must be serialized
     const serializedConversation = {
-      ...conversation.data,
-      _id: conversation.data._id.toString(),
+      ...conversation,
+      _id: conversation._id.toString(),
     };
 
     navigate(`/conversations/${serializedConversation?._id}`, {
@@ -35,6 +41,7 @@ export default function UserBox({ user }: { user: User }) {
 
   return (
     <div className={styles["user-box"]} onClick={conversationCreateHandler}>
+      {user.active === true && <p>online</p>}
       <div>
         <img
           className={styles["user-img"]}

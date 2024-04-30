@@ -1,20 +1,22 @@
-import React, { useState, useMemo } from "react";
 import styles from "./ConversationsList.module.css";
+import React, { useState, useMemo } from "react";
+
 import ConversationBox from "./ConversationBox";
-import { Conversation } from "../../../types/database";
 import ConversationBoxSkeleton from "../../skeletons/BoxSkeleton";
 import getConversationName from "../../../utils/getConversationName";
 import Searchbar from "../../ui/Searchbar";
+
+import { Conversation } from "../../../types/database";
 
 interface ConversationListProps {
   conversations: Conversation[];
   isLoading: boolean;
 }
 
-function ConversationsList({
+const ConversationsList = ({
   conversations: initialConversations,
   isLoading,
-}: ConversationListProps) {
+}: ConversationListProps) => {
   const [searchValue, setSearchValue] = useState("");
 
   const conversations = useMemo(() => {
@@ -32,7 +34,7 @@ function ConversationsList({
 
   const skeletonContent = Array(8)
     .fill(0)
-    .map((item, index) => <ConversationBoxSkeleton key={index} />);
+    .map((_, index) => <ConversationBoxSkeleton key={index} />);
 
   return (
     <div className={styles["conversations-list"]}>
@@ -44,6 +46,7 @@ function ConversationsList({
       <hr />
     </div>
   );
-}
+};
 
-export default React.memo(ConversationsList);
+const ConversationsListComponent = React.memo(ConversationsList);
+export default ConversationsListComponent;

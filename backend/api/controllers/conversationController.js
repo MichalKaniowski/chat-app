@@ -1,4 +1,5 @@
 const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 const User = require("../models/User");
 
 async function getConversations(req, res) {
@@ -10,7 +11,6 @@ async function getConversations(req, res) {
     const user = await User.findOne({ email })
       .populate("conversationIds")
       .select("-password");
-    // .slice("conversations => messageIds")
 
     const conversations = await user?.conversationIds;
 
@@ -86,10 +86,16 @@ async function getConversation(req, res) {
     const conversationId = req.params.conversationId;
     const conversation = await Conversation.findOne({
       _id: conversationId,
-    }).populate([
-      { path: "userIds", select: "-password" },
-      { path: "messageIds", populate: { path: "authorId" } },
-    ]);
+    })
+      .populate([
+        { path: "userIds", select: "-password" },
+        { path: "messageIds", populate: { path: "seenIds authorId" } }, //authorId seenIds
+      ])
+      .lean();
+
+    if (!conversation) {
+      return res.status(200).json(null);
+    }
 
     res.status(200).json(conversation);
   } catch (error) {
@@ -118,8 +124,16 @@ async function updateSeenInConversation(req, res) {
       }
     }
 
-    user.seenMessageIds = [...user.seenMessageIds, ...messageIdsToAdd];
-    await user.save();
+    const newSeenMessageIds = [...user.seenMessageIds, ...messageIdsToAdd];
+    await User.updateOne(
+      { _id: user._id },
+      { seenMessageIds: newSeenMessageIds }
+    );
+
+    await Message.updateMany(
+      { _id: { $in: messageIds } },
+      { $addToSet: { seenIds: userId } }
+    );
 
     res
       .status(200)

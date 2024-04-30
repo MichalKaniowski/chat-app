@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import {
   Conversation,
   Token,
@@ -17,7 +17,8 @@ import toast from "react-hot-toast";
 import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import axios from "axios";
 import Message from "./Message";
-import Modal from "../../ui/ImageModal";
+import { socket } from "../../../utils/socket";
+import { useDropzone } from "react-dropzone";
 
 interface ConversationContentProps {
   conversation: Conversation;
@@ -32,29 +33,49 @@ export default function ConversationContent({
 }: ConversationContentProps) {
   const [isSending, setIsSending] = useState(false);
   const [uploadedImage, setUploadedImage] = useState("");
+  const [preview, setPreview] = useState<ArrayBuffer | string | null>();
 
-  useEffect(() => {
-    const imageInput = document.getElementById(
-      "image-input"
-    ) as HTMLInputElement;
+  const onDrop = useCallback((acceptedFiles: FileList) => {
+    const file = new FileReader();
 
-    function imageChangeHandler() {
-      const file = imageInput.files![0];
-      const reader = new FileReader();
+    file.readAsDataURL(acceptedFiles[0]);
 
-      reader.onload = (e) => {
-        const imgUrl = e.target?.result as string;
-        setUploadedImage(imgUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    imageInput?.addEventListener("change", imageChangeHandler);
-
-    return () => {
-      imageInput.removeEventListener("change", imageChangeHandler);
+    file.onload = () => {
+      // todo: think about what if file is video, how to make preview then
+      setPreview(file.result);
     };
   }, []);
+
+  const { onConversationOpenStateChange } = useContext(ConversationsContext);
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
+    useDropzone({ onDrop });
+  console.log(acceptedFiles);
+
+  const messageRef = useRef<HTMLInputElement>(null!);
+
+  // useEffect(() => {
+  //   const imageInput = document.getElementById(
+  //     "file-input"
+  //   ) as HTMLInputElement;
+
+  //   function imageChangeHandler() {
+  //     const file = imageInput.files![0];
+  //     const reader = new FileReader();
+
+  //     reader.onload = (e) => {
+  //       const imgUrl = e.target?.result as string;
+  //       setUploadedImage(imgUrl);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+
+  //   // todo: why setting event listener and not just adding onChange to input??
+  //   imageInput?.addEventListener("change", imageChangeHandler);
+
+  //   return () => {
+  //     imageInput.removeEventListener("change", imageChangeHandler);
+  //   };
+  // }, []);
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
@@ -82,84 +103,96 @@ export default function ConversationContent({
     updateSeenInConversation();
   }, [conversation.messageIds, conversation._id]);
 
-  const conversationContext = useContext(ConversationsContext);
-  conversationContext.onConversationStateChange(true);
-  const imgSrc = conversation?.image || "/images/person-placeholder.png";
+  useEffect(() => {
+    onConversationOpenStateChange(true);
+  }, [onConversationOpenStateChange]);
 
   const token = sessionStorage.getItem("token") as string;
-  const { email } = jwtDecode(token) as Token;
-  const messageRef = useRef<HTMLInputElement>(null!);
+  const { id, email } = jwtDecode(token) as Token;
 
   const users = conversation?.userIds as User[];
   const messages = conversation?.messageIds as MessageType[];
-
   const conversationName = getConversationName(conversation);
+  const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
   async function messageCreateHandler(e: React.FormEvent) {
     e.preventDefault();
 
-    const imageInput = document.getElementById(
-      "image-input"
-    ) as HTMLInputElement;
-    if (imageInput.files!.length > 0) {
+    // todo: change document.getElemenetById to ref and add ref to image input
+    // const imageInput = document.getElementById(
+    //   "file-input"
+    // ) as HTMLInputElement;
+
+    if (acceptedFiles.length > 0) {
+      // todo: remove trycatch and extract code in this if statement to another function
       try {
-        const file = imageInput.files![0];
-        const reader = new FileReader();
+        //   const newMessage = {
+        //     body: content,
+        //     isBodyAnImage: true,
+        //     image: image,
+        //     authorId: author._id,
+        //     conversationId: conversation._id,
+        //   };
 
-        const sizeInKb = Number((file.size / 1024).toFixed(2));
+        const author = users.find((user: User) => user.email === email)!;
+        const image = author.image || "/images/person-placeholder.png";
 
-        if (sizeInKb > 500) {
-          toast.error("File is too large");
-          return;
-        }
-
-        reader.onload = async function (e: any) {
-          const content = e.target.result;
-
-          const author = users.find((user: User) => user.email === email)!;
-          const image = author.image || "/images/person-placeholder.png";
-
-          // adding fake message, so there is no loading after sending a message
-          // once real message is created this message will be removed
-          imageInput.value = "";
-          onMessageAdd({
-            _id: "fake-message",
-            body: content,
-            isBodyAnImage: true,
-            image: image,
-            authorId: author,
-            conversationId: conversation._id,
-            seenIds: [],
-          });
-          setIsSending(true);
-
-          const res = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/messages`,
-            {
-              body: content,
-              isBodyAnImage: true,
-              image: image,
-              authorId: author._id,
-              conversationId: conversation._id,
-            },
-            {
-              headers: {
-                Authorization: getAuthorizationHeader(),
-              },
-            }
-          );
-
-          setIsSending(false);
-          const message = await res.data;
-          onMessageAdd(message);
-          setUploadedImage("");
+        const formData = new FormData();
+        acceptedFiles.forEach((file) => formData.append("file", file));
+        const newMessage = {
+          authorId: author._id,
+          image,
+          conversationId: conversation._id,
         };
+        formData.append("newMessage", JSON.stringify(newMessage));
+        // imageInput.value = "";
 
-        reader.readAsDataURL(file);
+        // adding fake message, so there is no loading after sending a message
+        // once real message is created this message will be removed
+        // onMessageAdd({
+        //   _id: "fake-message",
+        //   ...newMessage,
+        //   seenIds: [],
+        // });
+        setIsSending(true);
+
+        const res = await axios.post(
+          "http://localhost:3000/messages",
+          formData,
+          {
+            headers: {
+              Authorization: getAuthorizationHeader(),
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log("RESPONSE: ", res);
+        // const res = await axios.post(
+        //   `${import.meta.env.VITE_API_BASE_URL}/messages`,
+        //   newMessage,
+        //   {
+        //     headers: {
+        //       Authorization: getAuthorizationHeader(),
+        //     },
+        //   }
+        // );
+
+        //todo: what is we will get error as res here, will we setIsSending to false??
+
+        setIsSending(false);
+        // const message = await res.data;
+        // socket.emit("send-message", {
+        //   message: message,
+        //   room: conversation._id,
+        // });
+        // onMessageAdd(message);
+        // setUploadedImage("");
       } catch (error) {
         toast.error("Something went wrong");
       }
     } else {
+      // todo: remove trycatch and extract code in this if statement to another function
       try {
         const author = users.find((user: User) => user.email === email)!;
 
@@ -210,9 +243,14 @@ export default function ConversationContent({
 
         setIsSending(false);
         const message = await res.data;
+        socket.emit("send-message", {
+          message: message,
+          room: conversation._id,
+        });
         onMessageAdd(message);
-      } catch {
+      } catch (error) {
         toast.error("Something went wrong");
+        console.log(error);
       }
     }
   }
@@ -220,13 +258,14 @@ export default function ConversationContent({
   return (
     <div className={styles.conversation}>
       <div className={styles.header}>
-        <div className={styles["header-content"]}>
+        <div
+          className={styles["header-content"]}
+          style={{ backgroundColor: isDragActive ? "red" : "white" }}
+        >
           {!isScreenBig && (
             <Link
               to="/conversations"
-              onClick={() =>
-                conversationContext.onConversationStateChange(false)
-              }
+              onClick={() => onConversationOpenStateChange(false)}
             >
               <AiOutlineArrowLeft
                 size={24}
@@ -243,53 +282,100 @@ export default function ConversationContent({
         <hr />
       </div>
 
-      {messages?.length > 0 ? (
-        <div className={styles.body}>
-          <ul className={styles.messages}>
-            {messages?.map((message: MessageType) => {
-              return <Message key={message._id} message={message} />;
-            })}
-            <div id="scroll-to"></div>
-          </ul>
-        </div>
-      ) : (
-        <div className={styles["empty-conversation"]}>
-          No messages exchanged with this user.
-        </div>
-      )}
+      <div
+        {...getRootProps()}
+        onClick={() => {}}
+        style={{ height: "calc(100% - 72px)" }}
+      >
+        {messages?.length > 0 ? (
+          <div className={styles.body}>
+            <ul className={styles.messages}>
+              {messages?.map((message: MessageType, index) => {
+                const author = message.authorId as User;
 
-      <div className={styles.footer}>
-        <hr />
-        <form
-          onSubmit={messageCreateHandler}
-          className={styles["message-form"]}
-        >
-          <label htmlFor="image-input" className={styles["custom-file-upload"]}>
-            <BsImages size={28} />
-          </label>
-          <input
-            id="image-input"
+                const seenByPeopleString = (message.seenIds as User[])
+                  .filter((user: User) => user._id !== id)
+                  .filter((user) => user._id !== author._id)
+                  .map((user) => user.username)
+                  .join(", ");
+
+                if (index === messages.length - 1) {
+                  const isAuthor = author._id === id;
+
+                  return (
+                    <div key={message._id}>
+                      <Message key={message._id} message={message} />
+                      {seenByPeopleString && (
+                        <p
+                          className={styles["seen-by-text"]}
+                          style={{
+                            textAlign: isAuthor ? "end" : "start",
+                            [isAuthor ? "marginRight" : "marginLeft"]: "10px",
+                          }}
+                        >
+                          Seen by {seenByPeopleString}
+                        </p>
+                      )}
+                    </div>
+                  );
+                }
+
+                return <Message key={message._id} message={message} />;
+              })}
+              <div id="scroll-to"></div>
+            </ul>
+          </div>
+        ) : (
+          <div className={styles["empty-conversation"]}>
+            No messages exchanged with this user.
+          </div>
+        )}
+
+        <div className={styles.footer}>
+          <hr />
+          <form
+            onSubmit={messageCreateHandler}
+            className={styles["message-form"]}
+          >
+            <label
+              htmlFor="file-input"
+              className={styles["custom-file-upload"]}
+            >
+              <BsImages size={28} />
+            </label>
+            {/* <input
+            id="file-input"
             type="file"
-            accept=".jpg, .jpeg, .png"
+            accept=".jpg, .jpeg, .png, .mp4, .webm"
             className={styles["message-form-button"]}
             disabled={isSending}
-          />
-          {uploadedImage && (
-            <img
-              src={uploadedImage}
-              style={{ width: "40px", height: "40px" }}
+          /> */}
+            <input
+              id="file-input"
+              type="file"
+              multiple={true}
+              accept=".jpg, .jpeg, .png, .mp4, .webm"
+              className={styles["message-form-button"]}
+              disabled={isSending}
+              {...getInputProps()}
             />
-          )}
-          <input
-            ref={messageRef}
-            placeholder="Send a message"
-            className={styles["message-input"]}
-            disabled={isSending}
-          />
-          <button className={styles["message-form-button"]}>
-            <IoMdSend size={28} />
-          </button>
-        </form>
+            {uploadedImage && (
+              <img
+                src={uploadedImage}
+                style={{ width: "40px", height: "40px" }}
+              />
+            )}
+            <input
+              ref={messageRef}
+              placeholder="Send a message"
+              className={styles["message-input"]}
+              disabled={isSending}
+            />
+            <button className={styles["message-form-button"]}>
+              <IoMdSend size={28} />
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

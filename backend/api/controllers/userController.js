@@ -157,10 +157,23 @@ async function logoutUser(req, res) {
   }
 }
 
+async function updateOnlineStatus(req, res) {
+  try {
+    const { id: userId, isOnline } = req.body;
+    console.log("updating status to: ", isOnline);
+    await User.updateOne({ _id: userId }, { active: isOnline });
+
+    res.status(200).json({ message: "Succesfully updated online status" });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid userId or online status" });
+  }
+}
+
 module.exports = {
   getUsers,
   createUser,
   loginUser,
   createAccessToken,
   logoutUser,
+  updateOnlineStatus,
 };

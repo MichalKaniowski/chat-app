@@ -10,7 +10,7 @@ interface ConversationProps {
   onMessageAdd: (message: MessageType) => void;
 }
 
-function ConversationComponent({
+function _ConversationComponent({
   conversation,
   isLoading,
   isScreenBig,
@@ -29,4 +29,5 @@ function ConversationComponent({
   );
 }
 
-export default React.memo(ConversationComponent);
+const ConversationComponent = React.memo(_ConversationComponent);
+export default ConversationComponent;

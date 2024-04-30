@@ -7,12 +7,13 @@ import UsersPage from "./pages/Users.tsx";
 import ConversationsPage from "./pages/Conversations.tsx";
 import Error from "./components/Error.tsx";
 import App from "./App.tsx";
-import { ModalContextProvider } from "./store/ModalProvider.tsx";
+import { ModalContextProvider } from "./store/FileModalProvider.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    errorElement: <Error />,
     children: [
       { index: true, element: <App />, errorElement: <Error /> },
       { path: "/users", element: <UsersPage />, errorElement: <Error /> },
