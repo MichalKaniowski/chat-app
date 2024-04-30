@@ -10,6 +10,7 @@ import ConversationHeader from "./ConversationHeader";
 import { preview } from "../../../types/conversation";
 import ConversationMessages from "./ConversationMessages";
 import ConversationFooter from "./ConversationFooter";
+import toast from "react-hot-toast";
 
 interface ConversationContentProps {
   conversation: Conversation;
@@ -36,12 +37,36 @@ export default function ConversationContent({
   }, []);
 
   const { onConversationOpenStateChange } = useContext(ConversationsContext);
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
-    useDropzone({
-      onDrop,
-      maxSize: 25 * 1024 * 1024,
-      maxFiles: 5,
-    });
+  const {
+    acceptedFiles,
+    fileRejections,
+    getRootProps,
+    getInputProps,
+    isDragActive,
+  } = useDropzone({
+    onDrop,
+    maxSize: 25 * 1024 * 1024,
+    maxFiles: 5,
+    accept: {
+      "image/png": [".png"],
+      "image/jpeg": [".jpg", ".jpeg"],
+      "video/mp4": [".mp4"],
+      "video/webm": [".webm"],
+    },
+  });
+
+  useEffect(() => {
+    if (fileRejections.length > 0) {
+      const fileRejectionMessages = fileRejections.map(
+        (rejection) => rejection.errors[0].code
+      );
+      if (fileRejectionMessages.includes("file-invalid-type")) {
+        toast.error("Unsupported file type");
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [fileRejections]);
 
   useEffect(() => {
     document.querySelector("#scroll-to")?.scrollIntoView();
