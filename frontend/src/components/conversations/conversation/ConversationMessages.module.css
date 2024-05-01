@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 72px - 45px - 10px);
+  height: calc(100vh - 72px - 45px - 10px - 50px);
 }
 
 .body {

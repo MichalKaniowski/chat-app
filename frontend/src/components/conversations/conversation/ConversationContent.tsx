@@ -127,32 +127,39 @@ export default function ConversationContent({
 
   return (
     <div className={styles.conversation}>
+      {/* <div style={{ height: 70 }}> */}
       <ConversationHeader
         isScreenBig={isScreenBig}
         imgSrc={imgSrc}
         conversationName={conversationName}
       />
+      {/* </div> */}
 
-      <FileUploadOverlay isScreenBig={isScreenBig} getRootProps={getRootProps}>
-        {isDragActive && (
-          <div className={styles["file-drag-overlay"]}>
-            <p className={styles["file-drag-overlay-text"]}>
-              Upuść pliki tutaj
-            </p>
-          </div>
-        )}
+      <div style={{ height: "calc(100% - 72px)" }}>
+        <FileUploadOverlay
+          isScreenBig={isScreenBig}
+          getRootProps={getRootProps}
+        >
+          {isDragActive && (
+            <div className={styles["file-drag-overlay"]}>
+              <p className={styles["file-drag-overlay-text"]}>
+                Upuść pliki tutaj
+              </p>
+            </div>
+          )}
 
-        <ConversationMessages messages={messages} />
+          <ConversationMessages messages={messages} />
 
-        <ConversationFooter
-          preview={preview}
-          acceptedFiles={acceptedFiles}
-          conversation={conversation}
-          getInputProps={getInputProps}
-          onPreviewChange={(preview: preview) => setPreview(preview)}
-          onMessageAdd={onMessageAdd}
-        />
-      </FileUploadOverlay>
+          <ConversationFooter
+            preview={preview}
+            acceptedFiles={acceptedFiles}
+            conversation={conversation}
+            getInputProps={getInputProps}
+            onPreviewChange={(preview: preview) => setPreview(preview)}
+            onMessageAdd={onMessageAdd}
+          />
+        </FileUploadOverlay>
+      </div>
     </div>
   );
 }
