@@ -6,9 +6,10 @@
 }
 
 .body {
-  height: calc(100% - 45px - 10px);
+  height: calc(100vh - 72px - 45px - 10px);
+  overflow-y: scroll;
   padding: 0 10px;
-  overflow-y: auto;
+  position: relative;
 }
 
 .messages {
