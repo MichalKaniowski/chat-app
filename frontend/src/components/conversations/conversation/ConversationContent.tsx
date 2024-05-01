@@ -42,6 +42,7 @@ export default function ConversationContent({
     fileRejections,
     getRootProps,
     getInputProps,
+    open,
     isDragActive,
   } = useDropzone({
     onDrop,
@@ -112,7 +113,7 @@ export default function ConversationContent({
 
       <div
         {...getRootProps()}
-        onClick={() => {}}
+        onClick={isScreenBig ? () => {} : open}
         className={styles["conversation-content"]}
       >
         {isDragActive && (
