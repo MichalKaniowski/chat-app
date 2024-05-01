@@ -1,6 +1,4 @@
 [[redirects]]
-  from = "/"
-  to = "/conversations"
-[[redirects]]
-  from = "/"
-  to = "/users"
+from "/*"
+to="/index.html"
+status = 200
