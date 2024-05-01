@@ -2,11 +2,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 72px - 45px - 10px - 50px);
+  height: calc(100% - 72px - 45px - 10px - 50px);
 }
 
 .body {
-  height: calc(100vh - 72px - 45px - 10px);
+  height: calc(100% - 72px - 10px);
   overflow-y: scroll;
   padding: 0 10px;
   position: relative;
