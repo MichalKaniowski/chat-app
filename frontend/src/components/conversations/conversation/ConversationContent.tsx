@@ -103,6 +103,8 @@ export default function ConversationContent({
   const conversationName = getConversationName(conversation);
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
+  const onClickDesktop = useCallback(() => {}, []);
+
   return (
     <div className={styles.conversation}>
       <ConversationHeader
@@ -113,7 +115,7 @@ export default function ConversationContent({
 
       <div
         {...getRootProps()}
-        onClick={isScreenBig ? () => {} : open}
+        onClick={isScreenBig ? onClickDesktop : open}
         className={styles["conversation-content"]}
       >
         {isDragActive && (
