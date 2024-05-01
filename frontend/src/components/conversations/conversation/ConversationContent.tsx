@@ -18,6 +18,29 @@ interface ConversationContentProps {
   onMessageAdd: (message: MessageType) => void;
 }
 
+function FileUploadOverlay({
+  isScreenBig,
+  getRootProps,
+  children,
+}: {
+  isScreenBig: boolean;
+  getRootProps: <T extends object>() => T;
+  children: React.ReactNode;
+}) {
+  // the file upload doesnt work on iphones with this component and on phones we do not need that feature anyway
+  return isScreenBig ? (
+    <div
+      {...getRootProps()}
+      onClick={() => {}}
+      className={styles["conversation-content"]}
+    >
+      {children}
+    </div>
+  ) : (
+    <div>{children}</div>
+  );
+}
+
 export default function ConversationContent({
   conversation,
   isScreenBig,
@@ -42,7 +65,6 @@ export default function ConversationContent({
     fileRejections,
     getRootProps,
     getInputProps,
-    open,
     isDragActive,
   } = useDropzone({
     onDrop,
@@ -103,8 +125,6 @@ export default function ConversationContent({
   const conversationName = getConversationName(conversation);
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
-  const onClickDesktop = useCallback(() => {}, []);
-
   return (
     <div className={styles.conversation}>
       <ConversationHeader
@@ -113,11 +133,7 @@ export default function ConversationContent({
         conversationName={conversationName}
       />
 
-      <div
-        {...getRootProps()}
-        onClick={isScreenBig ? onClickDesktop : open}
-        className={styles["conversation-content"]}
-      >
+      <FileUploadOverlay isScreenBig={isScreenBig} getRootProps={getRootProps}>
         {isDragActive && (
           <div className={styles["file-drag-overlay"]}>
             <p className={styles["file-drag-overlay-text"]}>
@@ -136,7 +152,7 @@ export default function ConversationContent({
           onPreviewChange={(preview: preview) => setPreview(preview)}
           onMessageAdd={onMessageAdd}
         />
-      </div>
+      </FileUploadOverlay>
     </div>
   );
 }
