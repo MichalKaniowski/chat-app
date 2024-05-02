@@ -10,18 +10,14 @@ import { socket } from "../utils/socket";
 import fetchUsers from "../helpers/getUsers";
 import updateOnlineStatus from "../helpers/updateOnlineStatus";
 import { useQueryClient } from "react-query";
+
 export default function UsersPage() {
   const token = sessionStorage.getItem("token") as string;
   const { id, email }: Token = jwtDecode(token);
 
   const queryClient = useQueryClient();
-  const {
-    isLoading,
-    data: users,
-    // refetch: refetchUsers,
-  } = useQuery(["users"], getUsers, {
+  const { isLoading, data: users } = useQuery(["users"], getUsers, {
     staleTime: 30 * 1000, // 30 seconds
-    initialData: [],
   });
 
   useEffect(() => {

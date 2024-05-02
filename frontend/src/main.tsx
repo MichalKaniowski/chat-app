@@ -8,6 +8,7 @@ import ConversationsPage from "./pages/Conversations.tsx";
 import Error from "./components/Error.tsx";
 import App from "./App.tsx";
 import { ModalContextProvider } from "./store/FileModalProvider.tsx";
+import { QueryClientProvider, QueryClient } from "react-query";
 
 const router = createBrowserRouter([
   {
@@ -31,10 +32,14 @@ const router = createBrowserRouter([
   },
 ]);
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ModalContextProvider>
-      <RouterProvider router={router}></RouterProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router}></RouterProvider>
+      </QueryClientProvider>
     </ModalContextProvider>
   </React.StrictMode>
 );
