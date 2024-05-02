@@ -1,8 +1,8 @@
 import { useFileModalContext } from "../../hooks/context/useFileModalContext";
-import styles from "./ImageModal.module.css";
+import styles from "./FileModal.module.css";
 import { AiOutlineClose } from "react-icons/ai";
 
-export default function Modal({ fileUrl }: { fileUrl: string }) {
+export default function FileModal({ fileUrl }: { fileUrl: string }) {
   const { onModalClose } = useFileModalContext();
 
   const imageExtensions = ["jpg", "jpeg", "png"];
@@ -15,9 +15,9 @@ export default function Modal({ fileUrl }: { fileUrl: string }) {
   return (
     <div className={styles.backdrop} onClick={onModalClose}>
       <div className={styles.modal}>
-        {isFileImage && <img src={fileUrl} className={styles.image} />}
+        {isFileImage && <img src={fileUrl} className={styles.file} />}
         {isFileVideo && (
-          <video src={fileUrl} controls={true} className={styles.image} />
+          <video src={fileUrl} controls={true} className={styles.file} />
         )}
 
         <button className={styles["close-button"]} onClick={onModalClose}>

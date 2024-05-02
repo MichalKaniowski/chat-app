@@ -11,7 +11,7 @@ import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
 import { Conversation as ConversationType, Message } from "../types/database";
 import Navigation from "../components/navigation/Navigation";
-import Modal from "../components/ui/ImageModal";
+import FileModal from "../components/ui/FileModal";
 import Conversation from "../components/conversations/conversation/Conversation";
 import { useFileModalContext } from "../hooks/context/useFileModalContext";
 
@@ -153,7 +153,7 @@ export default function ConversationsPage() {
 
   return (
     <Navigation>
-      {isModalOpen && <Modal fileUrl={file} />}
+      {isModalOpen && <FileModal fileUrl={file} />}
       {(!state || isScreenBig) && (
         <ConversationsList
           conversations={conversations}
