@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-import toast from "react-hot-toast";
-
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import { useFileModalContext } from "../hooks/context/useFileModalContext";
+
 import { socket } from "../utils/socket";
+import updateSeen from "../helpers/updateSeen";
+import getConversation from "../helpers/getConversation";
+import getConversations from "../helpers/getConversations";
 
 import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
@@ -13,7 +14,6 @@ import { Conversation as ConversationType, Message } from "../types/database";
 import Navigation from "../components/navigation/Navigation";
 import FileModal from "../components/ui/FileModal";
 import Conversation from "../components/conversations/conversation/Conversation";
-import { useFileModalContext } from "../hooks/context/useFileModalContext";
 
 export default function ConversationsPage() {
   const { state } = useLocation();
@@ -23,16 +23,17 @@ export default function ConversationsPage() {
 
   const { isModalOpen, file } = useFileModalContext();
 
-  const { isLoading: conversationIsLoading } = useQuery(
-    ["conversation"],
-    getAndSetNewestConversation
+  const convId = activeConversation?._id || state?._id || ("" as string);
+  const { isLoading: conversationIsLoading } = useQuery(["conversation"], () =>
+    getConversation(convId)
   );
 
   const {
     isLoading: conversationsIsLoading,
-    data: conversations,
+    data,
     refetch: refetchConversations,
   } = useQuery(["conversations"], getConversations);
+  const conversations = data?.conversations || [];
 
   useEffect(() => {
     function updateScreenSize() {
@@ -62,65 +63,6 @@ export default function ConversationsPage() {
     setActiveConversation(state);
   }, [state]);
 
-  async function getAndSetNewestConversation() {
-    const conversationId = activeConversation?._id || state?._id;
-
-    if (!conversationId) return null;
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}`,
-      {
-        headers: {
-          Authorization: getAuthorizationHeader(),
-        },
-      }
-    );
-
-    const conversation = await res?.data;
-
-    if (!conversation) {
-      return toast.error(
-        "There was a problem while fetching this conversation"
-      );
-    }
-
-    setActiveConversation(conversation);
-    return conversation;
-  }
-
-  async function getConversations() {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/conversations`,
-        {
-          headers: {
-            Authorization: getAuthorizationHeader(),
-          },
-        }
-      );
-
-      const data = await res.data;
-      const newAccessToken = data?.token;
-
-      if (newAccessToken) {
-        sessionStorage.setItem("token", newAccessToken);
-      }
-
-      const conversations = data?.conversations;
-
-      // empty array won't be caught here
-      if (!conversations) {
-        return toast.error(
-          "Something went wrong while fetching conversations."
-        );
-      }
-
-      return conversations;
-    } catch (error) {
-      toast.error("Something went wrong while getting conversations.");
-    }
-  }
-
   const addMessageHandler = useCallback(
     async (message: Message) => {
       // todo: think about using optimisticQuery or sth like that from tanstack query
@@ -139,13 +81,7 @@ export default function ConversationsPage() {
         });
       }
 
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/conversations/${
-          message.conversationId
-        }/seen`,
-        {},
-        { headers: { Authorization: getAuthorizationHeader() } }
-      );
+      updateSeen(message.conversationId as string);
       refetchConversations();
     },
     [activeConversation, refetchConversations]

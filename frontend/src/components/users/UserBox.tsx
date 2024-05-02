@@ -1,9 +1,8 @@
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../types/database";
 import styles from "./UserBox.module.css";
-import getAuthorizationHeader from "../../utils/getAuthorizationHeader";
 import { socket } from "../../utils/socket";
+import createConversation from "../../helpers/createConversation";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
@@ -13,17 +12,8 @@ export default function UserBox({ user }: { user: User }) {
       state: { message: "loading" },
     });
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/conversations`,
-      { id: user._id },
-      {
-        headers: {
-          Authorization: getAuthorizationHeader(),
-        },
-      }
-    );
-
-    const conversation = await res.data;
+    const conversation = await createConversation(user._id);
+    if (!conversation) return;
 
     socket.emit("join-room", conversation._id);
     socket.emit("create-conversation", conversation);

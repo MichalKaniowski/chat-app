@@ -6,10 +6,9 @@ import { useRef, useState } from "react";
 import { socket } from "../../../utils/socket";
 import toast from "react-hot-toast";
 import jwtDecode from "jwt-decode";
-import axios from "axios";
-import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import { BsImages } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
+import createMessage from "../../../helpers/createMessage";
 
 interface ConversationFooterProps {
   preview: preview;
@@ -82,18 +81,9 @@ export default function ConversationFooter({
     });
     setIsSending(true);
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/messages/upload`,
-      formData,
-      {
-        headers: {
-          Authorization: getAuthorizationHeader(),
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const message = (await createMessage(formData)) as Message;
+    if (!message) return;
 
-    const message = await res.data;
     onMessageAdd(message);
     socket.emit("send-message", {
       message: message,

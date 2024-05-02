@@ -3,42 +3,18 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { Conversation, Message as MessageType } from "../../../types/database";
 import getConversationName from "../../../utils/getConversationName";
 import ConversationsContext from "../../../store/ConversationsProvider";
-import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
-import axios from "axios";
 import { useDropzone, FileWithPath } from "react-dropzone";
 import ConversationHeader from "./ConversationHeader";
 import { preview } from "../../../types/conversation";
 import ConversationMessages from "./ConversationMessages";
 import ConversationFooter from "./ConversationFooter";
 import toast from "react-hot-toast";
+import updateSeen from "../../../helpers/updateSeen";
 
 interface ConversationContentProps {
   conversation: Conversation;
   isScreenBig: boolean;
   onMessageAdd: (message: MessageType) => void;
-}
-
-function FileUploadOverlay({
-  isScreenBig,
-  getRootProps,
-  children,
-}: {
-  isScreenBig: boolean;
-  getRootProps: <T extends object>() => T;
-  children: React.ReactNode;
-}) {
-  // the file upload doesnt work on iphones with this component and on phones we do not need that feature anyway
-  return isScreenBig ? (
-    <div
-      {...getRootProps()}
-      onClick={() => {}}
-      className={styles["conversation-content"]}
-    >
-      {children}
-    </div>
-  ) : (
-    <div className={styles["conversation-content"]}>{children}</div>
-  );
 }
 
 export default function ConversationContent({
@@ -54,7 +30,6 @@ export default function ConversationContent({
     file.readAsDataURL(acceptedFiles[0]);
 
     file.onload = () => {
-      // todo: think about what if file is video, how to make preview then
       setPreview(file.result);
     };
   }, []);
@@ -105,13 +80,7 @@ export default function ConversationContent({
         return;
       }
 
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/conversations/${
-          conversation._id
-        }/seen`,
-        {},
-        { headers: { Authorization: getAuthorizationHeader() } }
-      );
+      await updateSeen(conversation._id);
     }
 
     updateSeenInConversation();
@@ -133,7 +102,11 @@ export default function ConversationContent({
         conversationName={conversationName}
       />
 
-      <FileUploadOverlay isScreenBig={isScreenBig} getRootProps={getRootProps}>
+      <div
+        {...getRootProps()}
+        onClick={() => {}}
+        className={styles["conversation-content"]}
+      >
         {isDragActive && (
           <div className={styles["file-drag-overlay"]}>
             <p className={styles["file-drag-overlay-text"]}>
@@ -152,7 +125,7 @@ export default function ConversationContent({
           onPreviewChange={(preview: preview) => setPreview(preview)}
           onMessageAdd={onMessageAdd}
         />
-      </FileUploadOverlay>
+      </div>
     </div>
   );
 }
