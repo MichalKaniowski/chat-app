@@ -6,7 +6,7 @@
 }
 
 .body {
-  height: calc(100% - 72px - 10px);
+  height: calc(100% - 50px);
   overflow-y: scroll;
   padding: 0 10px;
   position: relative;
