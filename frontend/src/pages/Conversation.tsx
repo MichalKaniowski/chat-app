@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useFileModalContext } from "../hooks/context/useFileModalContext";
 import useFetchConversation from "../hooks/fetch/useFetchConversation";
+import useFetchConversations from "../hooks/fetch/useFetchConversations";
 import useIsScreenBig from "../hooks/context/useIsScreenBig";
 
 import { socket } from "../utils/socket";
 import updateSeen from "../helpers/db/updateSeen";
-import getConversations from "../helpers/db/conversation/getConversations";
 import { Message } from "../types/database";
 
 import EmptyState from "../components/EmptyState";
@@ -30,11 +29,9 @@ export default function ConversationPage() {
 
   const {
     isLoading: conversationsIsLoading,
-    data,
+    conversations,
     refetch: refetchConversations,
-  } = useQuery(["conversations"], getConversations);
-
-  const conversations = data?.conversations || [];
+  } = useFetchConversations();
 
   const addMessageHandler = useCallback(
     async (message: Message) => {
