@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import styles from "./DesktopSidebar.module.css";
-import { BsFillPeopleFill, BsFillChatDotsFill } from "react-icons/bs";
+import { BsFillPeopleFill } from "react-icons/bs";
 import { CgLogOut } from "react-icons/cg";
 import { logoutUser } from "../../utils/logoutUser";
+import ConversationsLink from "./ConversationsLink";
 
 export default function DesktopSidebar({
   children,
@@ -16,9 +17,7 @@ export default function DesktopSidebar({
           <Link to="/users">
             <BsFillPeopleFill size={24} style={{ color: "#000" }} />
           </Link>
-          <Link to="/conversations">
-            <BsFillChatDotsFill size={24} style={{ color: "#000" }} />
-          </Link>
+          <ConversationsLink />
           <Link to="/" onClick={logoutUser}>
             <CgLogOut size={24} style={{ color: "#000" }} />
           </Link>

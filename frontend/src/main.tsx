@@ -11,6 +11,7 @@ import { ModalContextProvider } from "./store/FileModalProvider.tsx";
 import { QueryClientProvider, QueryClient } from "react-query";
 import ConversationPage from "./pages/Conversation.tsx";
 import { ScreenProvider } from "./store/ScreenProvider.tsx";
+import { ConversationProvider } from "./store/ConversationProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -40,9 +41,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ScreenProvider>
-        <ModalContextProvider>
-          <RouterProvider router={router}></RouterProvider>
-        </ModalContextProvider>
+        <ConversationProvider>
+          <ModalContextProvider>
+            <RouterProvider router={router}></RouterProvider>
+          </ModalContextProvider>
+        </ConversationProvider>
       </ScreenProvider>
     </QueryClientProvider>
   </React.StrictMode>

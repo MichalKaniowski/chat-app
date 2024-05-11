@@ -1,8 +1,9 @@
 import styles from "./MobileFooter.module.css";
-import { BsFillPeopleFill, BsFillChatDotsFill } from "react-icons/bs";
+import { BsFillPeopleFill } from "react-icons/bs";
 import { CgLogOut } from "react-icons/cg";
 import { Link, useLocation } from "react-router-dom";
 import { logoutUser } from "../../utils/logoutUser";
+import ConversationsLink from "./ConversationsLink";
 
 export default function MobileFooter({
   children,
@@ -13,7 +14,9 @@ export default function MobileFooter({
 
   // we are not checking for screen size, because footer won't be displayed on larger screens anyway
   const displayFooter =
-    pathname.includes("users") || pathname === "/conversations";
+    pathname.includes("users") ||
+    pathname === "/conversations" ||
+    pathname === "/conversations/";
 
   return (
     <div className={styles.container}>
@@ -28,9 +31,7 @@ export default function MobileFooter({
         <Link to="/users">
           <BsFillPeopleFill size={28} style={{ color: "#000" }} />
         </Link>
-        <Link to="/conversations">
-          <BsFillChatDotsFill size={28} style={{ color: "#000" }} />
-        </Link>
+        <ConversationsLink />
         <Link to="/" onClick={logoutUser}>
           <CgLogOut size={28} style={{ color: "#000" }} />
         </Link>

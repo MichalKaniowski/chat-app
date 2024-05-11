@@ -6,6 +6,7 @@ import getConversationName from "../../../utils/getConversationName";
 import jwtDecode from "jwt-decode";
 import { useEffect } from "react";
 import { socket } from "../../../utils/socket";
+import useConversationContext from "../../../hooks/context/useConversationContext";
 
 export default function ConversationBox({
   conversation,
@@ -13,6 +14,7 @@ export default function ConversationBox({
   conversation: Conversation;
 }) {
   const navigate = useNavigate();
+  const { onLastConversationSet } = useConversationContext();
 
   useEffect(() => {
     if (conversation?._id) {
@@ -41,6 +43,7 @@ export default function ConversationBox({
   async function getConversationHandler(conversationId: string) {
     try {
       navigate(`/conversations/${conversationId}`);
+      onLastConversationSet(conversationId);
     } catch (error) {
       toast.error("Something went wrong");
     }
