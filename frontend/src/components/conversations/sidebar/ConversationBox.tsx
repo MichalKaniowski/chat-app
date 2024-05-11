@@ -6,7 +6,6 @@ import getConversationName from "../../../utils/getConversationName";
 import jwtDecode from "jwt-decode";
 import { useEffect } from "react";
 import { socket } from "../../../utils/socket";
-import getConversation from "../../../helpers/getConversation";
 
 export default function ConversationBox({
   conversation,
@@ -16,16 +15,9 @@ export default function ConversationBox({
   const navigate = useNavigate();
 
   useEffect(() => {
-    // function receiveMessageHandler(message: Message) {
-    //   // console.log(message);
-    // }
     if (conversation?._id) {
       socket.emit("join-room", conversation._id);
     }
-    // socket.on("receive-message", receiveMessageHandler);
-    // return () => {
-    //   socket.off("receive-message", receiveMessageHandler);
-    // };
   }, [conversation._id]);
 
   const token = sessionStorage.getItem("token") as string;
@@ -34,7 +26,7 @@ export default function ConversationBox({
   const lastMessage = (conversation?.messageIds as Message[])?.at(
     -1
   ) as Message;
-  //todo: fix this
+
   const lastMessageBody =
     lastMessage?.fileUrls && lastMessage.fileUrls?.length > 0
       ? "file"
@@ -48,13 +40,7 @@ export default function ConversationBox({
 
   async function getConversationHandler(conversationId: string) {
     try {
-      const { conversation } = await getConversation(conversationId);
-
-      if (!conversation) return;
-
-      navigate(`/conversations/${conversation?._id}`, {
-        state: conversation,
-      });
+      navigate(`/conversations/${conversationId}`);
     } catch (error) {
       toast.error("Something went wrong");
     }
@@ -85,3 +71,4 @@ export default function ConversationBox({
     </div>
   );
 }
+``;

@@ -9,6 +9,8 @@ import Error from "./components/Error.tsx";
 import App from "./App.tsx";
 import { ModalContextProvider } from "./store/FileModalProvider.tsx";
 import { QueryClientProvider, QueryClient } from "react-query";
+import ConversationPage from "./pages/Conversation.tsx";
+import { ScreenProvider } from "./store/ScreenProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/conversations/:conversationId",
-        element: <ConversationsPage />,
+        element: <ConversationPage />,
         errorElement: <Error />,
       },
     ],
@@ -36,10 +38,12 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ModalContextProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router}></RouterProvider>
-      </QueryClientProvider>
-    </ModalContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <ScreenProvider>
+        <ModalContextProvider>
+          <RouterProvider router={router}></RouterProvider>
+        </ModalContextProvider>
+      </ScreenProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );

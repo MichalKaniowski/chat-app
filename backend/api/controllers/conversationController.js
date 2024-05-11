@@ -103,6 +103,24 @@ async function getConversation(req, res) {
   }
 }
 
+async function getLastConversationForUser(req, res) {
+  try {
+    const userData = req.userData; //from middleware
+    const userId = userData.id;
+
+    const user = await User.findOne({ _id: userId });
+    const conversationId = user.conversationIds[0].toString();
+
+    if (!conversationId) {
+      return res.status(400).json({ message: "Something went wrong" });
+    }
+
+    return res.status(200).json({ conversationId });
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong" });
+  }
+}
+
 async function updateSeenInConversation(req, res) {
   try {
     const { id: userId } = req?.userData;
@@ -147,5 +165,6 @@ module.exports = {
   getConversations,
   createConversation,
   getConversation,
+  getLastConversationForUser,
   updateSeenInConversation,
 };

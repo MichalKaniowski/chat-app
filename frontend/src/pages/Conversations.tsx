@@ -1,111 +1,68 @@
-import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
-import { useFileModalContext } from "../hooks/context/useFileModalContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useIsScreenBig from "../hooks/context/useIsScreenBig";
 
-import { socket } from "../utils/socket";
-import updateSeen from "../helpers/updateSeen";
-import getConversation from "../helpers/getConversation";
-import getConversations from "../helpers/getConversations";
+import { getLastConversationIdForUser } from "../helpers/db/conversation/getLastConversationForUser";
 
-import EmptyState from "../components/EmptyState";
 import ConversationsList from "../components/conversations/sidebar/ConversationsList";
-import { Conversation as ConversationType, Message } from "../types/database";
 import Navigation from "../components/navigation/Navigation";
-import FileModal from "../components/ui/FileModal";
 import Conversation from "../components/conversations/conversation/Conversation";
+import { useQuery } from "react-query";
+import getConversations from "../helpers/db/conversation/getConversations";
 
-export default function ConversationsPage() {
-  const { state } = useLocation();
-  const [isScreenBig, setIsScreenBig] = useState(false);
-  const [activeConversation, setActiveConversation] =
-    useState<ConversationType>(state);
-
-  const { isModalOpen, file } = useFileModalContext();
-
-  const convId = activeConversation?._id || state?._id || ("" as string);
-  const { isLoading: conversationIsLoading } = useQuery(["conversation"], () =>
-    getConversation(convId)
-  );
-
-  const {
-    isLoading: conversationsIsLoading,
-    data,
-    refetch: refetchConversations,
-  } = useQuery(["conversations"], getConversations);
-  const conversations = data?.conversations || [];
+function RedirectToConversationPage() {
+  const navigate = useNavigate();
+  const { isScreenBig } = useIsScreenBig();
 
   useEffect(() => {
-    function updateScreenSize() {
-      setIsScreenBig(window.innerWidth >= 600);
-    }
-    async function receiveMessageHandler(message: Message) {
-      addMessageHandler(message);
-    }
+    const fn = async () => {
+      const data = await getLastConversationIdForUser();
+      const conversationId = data.conversationId;
 
-    async function receiveConversationHandler() {
-      refetchConversations();
-    }
-
-    socket.on("receive-message", receiveMessageHandler);
-    socket.on("receive-conversation", receiveConversationHandler);
-    updateScreenSize();
-    window.addEventListener("resize", updateScreenSize);
-
-    return () => {
-      socket.off("receive-message", receiveMessageHandler);
-      socket.off("receive-conversation", receiveConversationHandler);
-      window.removeEventListener("resize", updateScreenSize);
-    };
-  }, []);
-
-  useEffect(() => {
-    setActiveConversation(state);
-  }, [state]);
-
-  const addMessageHandler = useCallback(
-    async (message: Message) => {
-      // todo: think about using optimisticQuery or sth like that from tanstack query
-      if (activeConversation) {
-        setActiveConversation((prevConversation: ConversationType) => {
-          const messages = (prevConversation.messageIds as Message[]).filter(
-            (message) => message._id !== "fake-message"
-          );
-
-          const newConversation = {
-            ...prevConversation,
-            messageIds: [...messages, message] as Message[],
-          };
-
-          return newConversation;
-        });
+      if (!conversationId) {
+        navigate("/users");
+        return;
       }
 
-      updateSeen(message.conversationId as string);
-      refetchConversations();
-    },
-    [activeConversation, refetchConversations]
+      navigate(`/conversations/${conversationId}`);
+    };
+
+    fn();
+  }, [navigate]);
+
+  // we are displaying loading ui of /conversations/:conversationId
+  // to not have a flash after redirect from /conversations to /conversations/:conversationId
+  return (
+    <Navigation>
+      {isScreenBig && <ConversationsList isLoading={true} />}
+
+      <Conversation isLoading={true} />
+    </Navigation>
+  );
+}
+
+function FetchedConversationsList() {
+  const { isLoading: conversationsIsLoading, data } = useQuery(
+    ["conversations"],
+    getConversations
   );
 
   return (
     <Navigation>
-      {isModalOpen && <FileModal fileUrl={file} />}
-      {(!state || isScreenBig) && (
-        <ConversationsList
-          conversations={conversations}
-          isLoading={conversationsIsLoading}
-        />
-      )}
-      {state ? (
-        <Conversation
-          conversation={activeConversation}
-          onMessageAdd={addMessageHandler}
-          isLoading={conversationIsLoading || state?.message === "loading"}
-          isScreenBig={isScreenBig}
-        />
-      ) : (
-        <EmptyState />
-      )}
+      <ConversationsList
+        conversations={data?.conversations}
+        isLoading={conversationsIsLoading}
+      />
     </Navigation>
+  );
+}
+
+export default function ConversationsPage() {
+  const { isScreenBig } = useIsScreenBig();
+
+  return isScreenBig ? (
+    <RedirectToConversationPage />
+  ) : (
+    <FetchedConversationsList />
   );
 }

@@ -9,12 +9,12 @@ import Searchbar from "../../ui/Searchbar";
 import { Conversation } from "../../../types/database";
 
 interface ConversationListProps {
-  conversations: Conversation[];
+  conversations?: Conversation[];
   isLoading: boolean;
 }
 
 const ConversationsList = ({
-  conversations: initialConversations,
+  conversations: initialConversations = [],
   isLoading,
 }: ConversationListProps) => {
   const [searchValue, setSearchValue] = useState("");

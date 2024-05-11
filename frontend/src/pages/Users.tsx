@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "../components/navigation/Navigation";
 import { socket } from "../utils/socket";
-import fetchUsers from "../helpers/getUsers";
-import updateOnlineStatus from "../helpers/updateOnlineStatus";
+import fetchUsers from "../helpers/db/user/getUsers";
+import updateOnlineStatus from "../helpers/db/updateOnlineStatus";
 import { useQueryClient } from "react-query";
 
 export default function UsersPage() {

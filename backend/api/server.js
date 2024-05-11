@@ -5,7 +5,6 @@ const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
-const testRoutes = require("./routes/testRoutes");
 
 const mongoose = require("mongoose");
 const { Server } = require("socket.io");
@@ -23,7 +22,6 @@ app.use(bodyParser.json({ limit: "500kb" }));
 app.use("/users", userRoutes);
 app.use("/conversations", conversationRoutes);
 app.use("/messages", messageRoutes);
-app.use("/test", testRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {

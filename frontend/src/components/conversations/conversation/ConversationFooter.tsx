@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import jwtDecode from "jwt-decode";
 import { BsImages } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
-import createMessage from "../../../helpers/createMessage";
+import createMessage from "../../../helpers/db/createMessage";
 
 interface ConversationFooterProps {
   preview: preview;
@@ -29,7 +29,7 @@ export default function ConversationFooter({
 }: ConversationFooterProps) {
   const [isSending, setIsSending] = useState(false);
 
-  const messageRef = useRef<HTMLInputElement>(null!);
+  const messageRef = useRef<HTMLInputElement | null>(null);
 
   const users = conversation?.userIds as User[];
   const token = sessionStorage.getItem("token") as string;
@@ -38,7 +38,6 @@ export default function ConversationFooter({
   const isPreviewImage = preview?.toString().includes("image");
   const isPreviewVideo = preview?.toString().includes("video");
 
-  //todo: check if trycatches are needed
   async function messageCreateHandler(e: React.FormEvent) {
     e.preventDefault();
 
@@ -46,7 +45,7 @@ export default function ConversationFooter({
     const image = author.image || "/images/person-placeholder.png";
     const authorId = author._id;
     const conversationId = conversation._id;
-    const body = messageRef.current.value.trim();
+    const body = messageRef?.current?.value.trim() ?? "";
 
     const newMessage = {
       body,
@@ -66,7 +65,7 @@ export default function ConversationFooter({
       return toast.error("Your message is empty");
     }
 
-    if (body?.length > 600) {
+    if (body.length > 600) {
       return toast.error("Your message is too long");
     }
 
@@ -91,7 +90,9 @@ export default function ConversationFooter({
     });
 
     setIsSending(false);
-    messageRef.current.value = "";
+    if (messageRef?.current) {
+      messageRef.current.value = "";
+    }
     onPreviewChange(null);
   }
 

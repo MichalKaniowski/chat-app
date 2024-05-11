@@ -5,6 +5,7 @@ const {
   getConversations,
   createConversation,
   getConversation,
+  getLastConversationForUser,
   updateSeenInConversation,
 } = require("../controllers/conversationController");
 
@@ -12,8 +13,18 @@ router.get("/", checkAuth, getConversations);
 
 router.post("/", checkAuth, createConversation);
 
-router.get("/:conversationId", checkAuth, getConversation);
+router.get(
+  "/getLastConversationForUser",
+  checkAuth,
+  getLastConversationForUser
+);
 
-router.post("/:conversationId/seen", checkAuth, updateSeenInConversation);
+router.get("/conversation/:conversationId", checkAuth, getConversation);
+
+router.post(
+  "/conversation/:conversationId/seen",
+  checkAuth,
+  updateSeenInConversation
+);
 
 module.exports = router;

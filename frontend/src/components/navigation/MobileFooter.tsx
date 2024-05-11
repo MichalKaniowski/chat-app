@@ -3,18 +3,17 @@ import { BsFillPeopleFill, BsFillChatDotsFill } from "react-icons/bs";
 import { CgLogOut } from "react-icons/cg";
 import { Link, useLocation } from "react-router-dom";
 import { logoutUser } from "../../utils/logoutUser";
-import { useContext } from "react";
-import ConversationsContext from "../../store/ConversationsProvider";
 
 export default function MobileFooter({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isConversationOpen } = useContext(ConversationsContext);
   const { pathname } = useLocation();
 
-  const displayFooter = pathname.includes("users") || !isConversationOpen;
+  // we are not checking for screen size, because footer won't be displayed on larger screens anyway
+  const displayFooter =
+    pathname.includes("users") || pathname === "/conversations";
 
   return (
     <div className={styles.container}>
@@ -25,19 +24,17 @@ export default function MobileFooter({
       >
         {children}
       </div>
-      {!isConversationOpen && (
-        <div className={styles.footer}>
-          <Link to="/users">
-            <BsFillPeopleFill size={28} style={{ color: "#000" }} />
-          </Link>
-          <Link to="/conversations">
-            <BsFillChatDotsFill size={28} style={{ color: "#000" }} />
-          </Link>
-          <Link to="/" onClick={logoutUser}>
-            <CgLogOut size={28} style={{ color: "#000" }} />
-          </Link>
-        </div>
-      )}
+      <div className={styles.footer}>
+        <Link to="/users">
+          <BsFillPeopleFill size={28} style={{ color: "#000" }} />
+        </Link>
+        <Link to="/conversations">
+          <BsFillChatDotsFill size={28} style={{ color: "#000" }} />
+        </Link>
+        <Link to="/" onClick={logoutUser}>
+          <CgLogOut size={28} style={{ color: "#000" }} />
+        </Link>
+      </div>
     </div>
   );
 }

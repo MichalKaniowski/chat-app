@@ -1,4 +1,4 @@
-import deleteUser from "../helpers/deleteUser";
+import deleteUser from "../helpers/db/user/deleteUser";
 
 export async function logoutUser() {
   sessionStorage.removeItem("token");

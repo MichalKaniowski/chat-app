@@ -1,25 +1,22 @@
 import styles from "./ConversationContent.module.css";
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Conversation, Message as MessageType } from "../../../types/database";
 import getConversationName from "../../../utils/getConversationName";
-import ConversationsContext from "../../../store/ConversationsProvider";
 import { useDropzone, FileWithPath } from "react-dropzone";
 import ConversationHeader from "./ConversationHeader";
 import { preview } from "../../../types/conversation";
 import ConversationMessages from "./ConversationMessages";
 import ConversationFooter from "./ConversationFooter";
 import toast from "react-hot-toast";
-import updateSeen from "../../../helpers/updateSeen";
+import updateSeen from "../../../helpers/db/updateSeen";
 
 interface ConversationContentProps {
   conversation: Conversation;
-  isScreenBig: boolean;
   onMessageAdd: (message: MessageType) => void;
 }
 
 export default function ConversationContent({
   conversation,
-  isScreenBig,
   onMessageAdd,
 }: ConversationContentProps) {
   const [preview, setPreview] = useState<preview>(null);
@@ -34,7 +31,6 @@ export default function ConversationContent({
     };
   }, []);
 
-  const { onConversationOpenStateChange } = useContext(ConversationsContext);
   const {
     acceptedFiles,
     fileRejections,
@@ -86,21 +82,13 @@ export default function ConversationContent({
     updateSeenInConversation();
   }, [conversation.messageIds, conversation._id]);
 
-  useEffect(() => {
-    onConversationOpenStateChange(true);
-  }, [onConversationOpenStateChange]);
-
   const messages = conversation?.messageIds as MessageType[];
   const conversationName = getConversationName(conversation);
   const imgSrc = conversation?.image || "/images/person-placeholder.png";
 
   return (
     <div className={styles.conversation}>
-      <ConversationHeader
-        isScreenBig={isScreenBig}
-        imgSrc={imgSrc}
-        conversationName={conversationName}
-      />
+      <ConversationHeader imgSrc={imgSrc} conversationName={conversationName} />
 
       <div
         {...getRootProps()}

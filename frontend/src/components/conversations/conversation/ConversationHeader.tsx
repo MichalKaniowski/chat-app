@@ -1,30 +1,24 @@
 import styles from "./ConversationHeader.module.css";
-import { useContext } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import ConversationsContext from "../../../store/ConversationsProvider";
+import useIsScreenBig from "../../../hooks/context/useIsScreenBig";
 
 interface ConversationHeaderProps {
-  isScreenBig: boolean; //todo: check where isScreenBig is used, and is it needed to be prop-drilled
   imgSrc: string;
   conversationName: string;
 }
 
 export default function ConversationHeader({
-  isScreenBig,
   imgSrc,
   conversationName,
 }: ConversationHeaderProps) {
-  const { onConversationOpenStateChange } = useContext(ConversationsContext);
+  const { isScreenBig } = useIsScreenBig();
 
   return (
     <div>
       <div className={styles["header-content"]}>
         {!isScreenBig && (
-          <Link
-            to="/conversations"
-            onClick={() => onConversationOpenStateChange(false)}
-          >
+          <Link to="/conversations">
             <AiOutlineArrowLeft
               size={24}
               className={styles["back-arrow-mobile"]}

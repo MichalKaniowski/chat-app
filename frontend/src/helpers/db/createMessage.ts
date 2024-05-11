@@ -1,5 +1,5 @@
 import axios from "axios";
-import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import getAuthorizationHeader from "../../utils/getAuthorizationHeader";
 import toast from "react-hot-toast";
 
 export default async function createMessage(formData: FormData) {

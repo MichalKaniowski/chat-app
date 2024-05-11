@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import getAuthorizationHeader from "../utils/getAuthorizationHeader";
+import getAuthorizationHeader from "../../../utils/getAuthorizationHeader";
 import axios from "axios";
 
 export default async function getUsers() {

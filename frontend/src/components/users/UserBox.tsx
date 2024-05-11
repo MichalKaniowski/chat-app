@@ -2,31 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../types/database";
 import styles from "./UserBox.module.css";
 import { socket } from "../../utils/socket";
-import createConversation from "../../helpers/createConversation";
+import createConversation from "../../helpers/db/conversation/createConversation";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
 
   async function conversationCreateHandler() {
-    navigate(`/conversations/loading-state`, {
-      state: { message: "loading" },
-    });
+    // we are navigating to /conversations to show loading state while creating a conversation
+    // without it user would wait some time before being redirected to specific conversation url
+    navigate("/conversations");
 
+    // if conversation already exists, a new one won't be created
     const conversation = await createConversation(user._id);
     if (!conversation) return;
 
-    socket.emit("join-room", conversation._id);
+    const id = conversation._id.toString();
+
+    socket.emit("join-room", id);
     socket.emit("create-conversation", conversation);
 
-    // data passed to navigate must be serialized
-    const serializedConversation = {
-      ...conversation,
-      _id: conversation._id.toString(),
-    };
-
-    navigate(`/conversations/${serializedConversation?._id}`, {
-      state: serializedConversation,
-    });
+    navigate(`/conversations/${id}`);
   }
 
   return (
