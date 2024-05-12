@@ -9,6 +9,6 @@ export default function getSession() {
 
     return { token, refreshToken, decodedToken };
   } catch (error) {
-    return { token: "", refreshToken: "", decodedToken: {} };
+    return { token: "", refreshToken: "", decodedToken: null };
   }
 }
