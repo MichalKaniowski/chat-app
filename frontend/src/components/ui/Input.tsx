@@ -4,6 +4,7 @@ import styles from "./Input.module.css";
 interface InputProps {
   id: string;
   label: string;
+  placeholder?: string;
   type?: string;
   onValueChange: (value: string) => void;
   validate: (value: string) => boolean;
@@ -13,6 +14,7 @@ export default function Input({
   id,
   label,
   type,
+  placeholder,
   onValueChange,
   validate,
 }: InputProps) {
@@ -36,6 +38,7 @@ export default function Input({
         value={value}
         onChange={valueChangeHandler}
         onBlur={() => setHasTouched(true)}
+        placeholder={placeholder}
         style={{ backgroundColor: isInvalid ? "#E5A29F" : "inherit" }}
         type={type ? type : "text"}
       />

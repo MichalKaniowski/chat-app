@@ -10,5 +10,24 @@ input {
 }
 
 label {
-  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+input {
+  display: block;
+  padding: 8px;
+  width: 100%;
+  border-radius: 5px;
+  border-color: hsl(0, 0%, 83%);
+  color: red;
+}
+
+input::placeholder {
+  color: hsl(0, 0%, 45%);
+  opacity: 1; /* Firefox */
+}
+
+input::-ms-input-placeholder {
+  /* Edge 12 -18 */
+  color: hsl(0, 0%, 45%);
 }

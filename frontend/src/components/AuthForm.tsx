@@ -99,66 +99,67 @@ export default function AuthForm() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} grainy`}>
       <div className={styles["form-container"]} onSubmit={formSubmitHandler}>
         <form>
           <h1 className={styles.heading}>
             {formState === "register" ? "Sign up" : "Sign in"}
           </h1>
 
-          {formState === "register" && (
+          <div className={styles["input-container"]}>
+            {formState === "register" && (
+              <Input
+                id="username"
+                label="Username"
+                placeholder="Jon Doe"
+                onValueChange={(value: string) => setUsername(value)}
+                validate={(value: string) => value.length > 0}
+              />
+            )}
+
             <Input
-              id="username"
-              label="Username"
-              onValueChange={(value: string) => setUsername(value)}
-              validate={(value: string) => value.length > 0}
+              id="email"
+              label="Email"
+              placeholder="john.doe@email.com"
+              onValueChange={(value: string) => setEmail(value)}
+              validate={(value: string) =>
+                value.includes("@") && value.includes(".")
+              }
             />
-          )}
 
-          <Input
-            id="email"
-            label="Email"
-            onValueChange={(value: string) => setEmail(value)}
-            validate={(value: string) =>
-              value.includes("@") && value.includes(".")
-            }
-          />
-
-          <Input
-            id="password"
-            label="Password"
-            onValueChange={(value: string) => setPassword(value)}
-            type="password"
-            validate={(value: string) => value.length > 5}
-          />
+            <Input
+              id="password"
+              label="Password"
+              placeholder="******"
+              onValueChange={(value: string) => setPassword(value)}
+              type="password"
+              validate={(value: string) => value.length > 5}
+            />
+          </div>
 
           <button className={styles["action-button"]}>
             {formState === "register" ? "Sign up" : "Sign in"}
           </button>
         </form>
-        <hr />
         <div className={styles["social-buttons-container"]}>
           <button className={styles["social-button"]}>
-            <AiOutlineGoogle size={24} />
-          </button>
-          <button className={styles["social-button"]}>
-            <AiFillGithub size={24} />
+            <img
+              src="/images/google-icon.svg"
+              className={styles["social-icon"]}
+            />
           </button>
         </div>
-        <div className={styles["already-user"]}>
+        <button
+          type="button"
+          onClick={formStateChangeHandler}
+          className={styles["already-user-button"]}
+        >
           <p>
             {formState === "login"
               ? "Don't have an account?"
               : "Already a user?"}
           </p>
-          <button
-            className={styles["change-action-button"]}
-            type="button"
-            onClick={formStateChangeHandler}
-          >
-            {formState === "login" ? "SIGN UP" : "SIGN IN"}
-          </button>
-        </div>
+        </button>
       </div>
     </div>
   );
