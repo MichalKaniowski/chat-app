@@ -1,6 +1,10 @@
 import styles from "./ConversationContent.module.css";
 import { useState, useEffect, useCallback } from "react";
-import { Conversation, Message as MessageType } from "../../../types/database";
+import {
+  Conversation,
+  Message as MessageType,
+  User,
+} from "../../../types/database";
 import getConversationName from "../../../utils/getConversationName";
 import { useDropzone, FileWithPath } from "react-dropzone";
 import ConversationHeader from "./ConversationHeader";
@@ -9,6 +13,7 @@ import ConversationMessages from "./ConversationMessages";
 import ConversationFooter from "./ConversationFooter";
 import toast from "react-hot-toast";
 import updateSeen from "../../../helpers/db/updateSeen";
+import getIsActive from "../../../helpers/getIsActive";
 
 interface ConversationContentProps {
   conversation: Conversation;
@@ -20,6 +25,8 @@ export default function ConversationContent({
   onMessageAdd,
 }: ConversationContentProps) {
   const [preview, setPreview] = useState<preview>(null);
+
+  const isActive = getIsActive(conversation.userIds as User[]);
 
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     const file = new FileReader();
@@ -88,7 +95,11 @@ export default function ConversationContent({
 
   return (
     <div className={styles.conversation}>
-      <ConversationHeader imgSrc={imgSrc} conversationName={conversationName} />
+      <ConversationHeader
+        imgSrc={imgSrc}
+        isActive={isActive}
+        conversationName={conversationName}
+      />
 
       <div
         {...getRootProps()}

@@ -7,6 +7,8 @@ import jwtDecode from "jwt-decode";
 import { useEffect } from "react";
 import { socket } from "../../../utils/socket";
 import useConversationContext from "../../../hooks/context/useConversationContext";
+import OnlineStatus from "../../OnlineStatus";
+import getIsActive from "../../../helpers/getIsActive";
 
 export default function ConversationBox({
   conversation,
@@ -16,14 +18,16 @@ export default function ConversationBox({
   const navigate = useNavigate();
   const { onLastConversationSet } = useConversationContext();
 
+  const token = sessionStorage.getItem("token") as string;
+  const { id } = jwtDecode(token) as Token;
+
+  const isActive = getIsActive(conversation.userIds as User[]);
+
   useEffect(() => {
     if (conversation?._id) {
       socket.emit("join-room", conversation._id);
     }
   }, [conversation._id]);
-
-  const token = sessionStorage.getItem("token") as string;
-  const { id } = jwtDecode(token) as Token;
 
   const lastMessage = (conversation?.messageIds as Message[])?.at(
     -1
@@ -54,11 +58,12 @@ export default function ConversationBox({
       className={styles["conversation-box"]}
       onClick={() => getConversationHandler(conversation._id)}
     >
-      <div>
+      <div className={styles["img-container"]}>
         <img
           className={styles["conversation-img"]}
           src="/images/person-placeholder.png"
         />
+        {isActive && <OnlineStatus />}
       </div>
       <div>
         <h3 className={styles.name}>{conversationName}</h3>

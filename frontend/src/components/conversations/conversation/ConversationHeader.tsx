@@ -2,14 +2,17 @@ import styles from "./ConversationHeader.module.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import useIsScreenBig from "../../../hooks/context/useIsScreenBig";
+import OnlineStatus from "../../OnlineStatus";
 
 interface ConversationHeaderProps {
   imgSrc: string;
+  isActive: boolean;
   conversationName: string;
 }
 
 export default function ConversationHeader({
   imgSrc,
+  isActive,
   conversationName,
 }: ConversationHeaderProps) {
   const { isScreenBig } = useIsScreenBig();
@@ -25,7 +28,10 @@ export default function ConversationHeader({
             />
           </Link>
         )}
-        <img src={imgSrc} className={styles["conversation-img"]} />
+        <div className={styles["conversation-img-container"]}>
+          <img src={imgSrc} className={styles["conversation-img"]} />
+          {isActive && <OnlineStatus />}
+        </div>
         <div>
           <h3 className={styles["conversation-name"]}>{conversationName}</h3>
           <p>Active</p>

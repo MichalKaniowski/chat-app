@@ -3,12 +3,13 @@ import { User } from "../../types/database";
 import styles from "./UserBox.module.css";
 import { socket } from "../../utils/socket";
 import createConversation from "../../helpers/db/conversation/createConversation";
+import OnlineStatus from "../OnlineStatus";
 
 export default function UserBox({ user }: { user: User }) {
   const navigate = useNavigate();
 
   async function conversationCreateHandler() {
-    // we are navigating to /conversations to show loading state while creating a conversation
+    // we are navigating to /conversations to show loading state on desktops (on mobile it will be conversations list) while creating a conversation
     // without it user would wait some time before being redirected to specific conversation url
     navigate("/conversations");
 
@@ -26,12 +27,12 @@ export default function UserBox({ user }: { user: User }) {
 
   return (
     <div className={styles["user-box"]} onClick={conversationCreateHandler}>
-      {user.active === true && <p>online</p>}
-      <div>
+      <div className={styles["user-img-container"]}>
         <img
           className={styles["user-img"]}
           src="/images/person-placeholder.png"
         />
+        {user.active === true && <OnlineStatus />}
       </div>
       <div>
         <h3 className={styles.username}>{user.username}</h3>

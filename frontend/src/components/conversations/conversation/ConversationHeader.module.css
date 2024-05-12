@@ -10,6 +10,10 @@
   color: rgb(0, 132, 255);
 }
 
+.conversation-img-container {
+  position: relative;
+}
+
 .conversation-img {
   width: 50px;
   height: 50px;
